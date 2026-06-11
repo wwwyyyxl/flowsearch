@@ -1,0 +1,10 @@
+{
+  "name": "@flowsearch/base",
+  "version": "1.0.0",
+  "description": "FlowSearch 基础类型库:PageState 状态机、通用类型契约。零装饰器,可平移到 Kotlin。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {}
+}

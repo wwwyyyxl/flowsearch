@@ -1,0 +1,34 @@
+{
+  "float": [
+    { "name": "fs_space_xs",   "value": "4vp" },
+    { "name": "fs_space_sm",   "value": "8vp" },
+    { "name": "fs_space_md",   "value": "12vp" },
+    { "name": "fs_space_lg",   "value": "16vp" },
+    { "name": "fs_space_xl",   "value": "20vp" },
+    { "name": "fs_space_2xl",  "value": "24vp" },
+    { "name": "fs_space_3xl",  "value": "32vp" },
+
+    { "name": "fs_radius_sm",   "value": "8vp" },
+    { "name": "fs_radius_md",   "value": "12vp" },
+    { "name": "fs_radius_lg",   "value": "16vp" },
+    { "name": "fs_radius_xl",   "value": "24vp" },
+    { "name": "fs_radius_full", "value": "9999vp" },
+
+    { "name": "fs_text_display",  "value": "24fp" },
+    { "name": "fs_text_title_1",  "value": "22fp" },
+    { "name": "fs_text_title_2",  "value": "18fp" },
+    { "name": "fs_text_body_lg",  "value": "16fp" },
+    { "name": "fs_text_body",     "value": "14fp" },
+    { "name": "fs_text_caption",  "value": "12fp" },
+
+    { "name": "fs_height_status_bar",   "value": "44vp" },
+    { "name": "fs_height_nav_bar",      "value": "44vp" },
+    { "name": "fs_height_search_bar",   "value": "44vp" },
+    { "name": "fs_height_button",       "value": "44vp" },
+    { "name": "fs_height_list_single",  "value": "48vp" },
+    { "name": "fs_height_list_double",  "value": "64vp" },
+    { "name": "fs_height_card_thumb",   "value": "96vp" },
+    { "name": "fs_height_tab_bar",      "value": "56vp" },
+    { "name": "fs_height_tool_circle",  "value": "56vp" }
+  ]
+}

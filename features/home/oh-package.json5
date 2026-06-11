@@ -1,0 +1,17 @@
+{
+  "name": "@flowsearch/home",
+  "version": "1.0.0",
+  "description": "FlowSearch 首页(P01-Home):频道 Tab + 工具入口 + LazyForEach Feed + 5 异常态。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../../commons/base",
+    "@flowsearch/theme": "file:../../commons/theme",
+    "@flowsearch/router": "file:../../commons/router",
+    "@flowsearch/ui": "file:../../commons/ui",
+    "@flowsearch/mockdata": "file:../../commons/mockdata",
+    "@flowsearch/favs": "file:../../features/favs"
+  }
+}

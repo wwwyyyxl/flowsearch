@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "search",
+    "type": "har",
+    "description": "FlowSearch search feature module",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

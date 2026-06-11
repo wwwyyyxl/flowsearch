@@ -1,0 +1,30 @@
+{
+  "color": [
+    { "name": "fs_color_primary",          "value": "#0C7A53" },
+    { "name": "fs_color_primary_tint",     "value": "#E6F4EE" },
+    { "name": "fs_color_primary_pressed",  "value": "#0A6646" },
+    { "name": "fs_color_background",       "value": "#F5F6F8" },
+    { "name": "fs_color_surface",          "value": "#FFFFFF" },
+    { "name": "fs_color_surface_subtle",   "value": "#FAFAFA" },
+    { "name": "fs_color_text_primary",     "value": "#1A1A1A" },
+    { "name": "fs_color_text_secondary",   "value": "#6B7280" },
+    { "name": "fs_color_text_tertiary",    "value": "#9CA3AF" },
+    { "name": "fs_color_text_inverse",     "value": "#FFFFFF" },
+    { "name": "fs_color_border",           "value": "#E5E7EB" },
+    { "name": "fs_color_border_strong",    "value": "#D1D5DB" },
+    { "name": "fs_color_danger",           "value": "#E5484D" },
+    { "name": "fs_color_warning",          "value": "#F5A524" },
+    { "name": "fs_color_info",             "value": "#3B82F6" },
+
+    { "name": "fs_color_tag_web_bg",       "value": "#DBEAFE" },
+    { "name": "fs_color_tag_web_text",     "value": "#1E40AF" },
+    { "name": "fs_color_tag_tool_bg",      "value": "#E6F4EE" },
+    { "name": "fs_color_tag_tool_text",    "value": "#0C7A53" },
+    { "name": "fs_color_tag_video_bg",     "value": "#FEF3C7" },
+    { "name": "fs_color_tag_video_text",   "value": "#92400E" },
+    { "name": "fs_color_tag_ai_bg",        "value": "#E6F4EE" },
+    { "name": "fs_color_tag_ai_text",      "value": "#0C7A53" },
+
+    { "name": "fs_color_offline_bar_bg",   "value": "#FEF3C7" }
+  ]
+}

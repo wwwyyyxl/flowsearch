@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "base",
+    "type": "har",
+    "description": "FlowSearch base types and state machine contracts",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

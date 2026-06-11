@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "router",
+    "type": "har",
+    "description": "FlowSearch routing table and navigation wrapper",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

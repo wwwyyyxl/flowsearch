@@ -1,0 +1,13 @@
+{
+  "name": "@flowsearch/ui",
+  "version": "1.0.0",
+  "description": "FlowSearch 通用 UI 组件:StateHost / SkeletonCard / EmptyBox / ErrorBox / OfflineBar。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../base",
+    "@flowsearch/theme": "file:../theme"
+  }
+}

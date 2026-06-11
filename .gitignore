@@ -1,0 +1,24 @@
+# HarmonyOS build outputs
+**/build/
+**/node_modules/
+**/oh_modules/
+**/.hvigor/
+**/.cxx/
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# hvigor
+hvigorw.bat
+hvigorw
+hvigor/
+
+# Local config
+local.properties
+
+# Test output
+**/test/
+!**/src/test/
+!**/src/ohosTest/

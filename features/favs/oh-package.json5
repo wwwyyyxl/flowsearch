@@ -1,0 +1,15 @@
+{
+  "name": "@flowsearch/favs",
+  "version": "1.0.0",
+  "description": "FlowSearch 收藏与历史(P05 FavoritesHistory):Preferences 持久化 + 双 Tab 页。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../../commons/base",
+    "@flowsearch/theme": "file:../../commons/theme",
+    "@flowsearch/router": "file:../../commons/router",
+    "@flowsearch/ui": "file:../../commons/ui"
+  }
+}

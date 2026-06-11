@@ -1,0 +1,12 @@
+{
+  "name": "@flowsearch/mockdata",
+  "version": "1.0.0",
+  "description": "FlowSearch 假数据集:与 PRD §07-Mock-API.md 一一对应,纯静态 JSON 风格,无装饰器无副作用。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../base"
+  }
+}

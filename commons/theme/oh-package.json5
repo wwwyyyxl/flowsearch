@@ -1,0 +1,10 @@
+{
+  "name": "@flowsearch/theme",
+  "version": "1.0.0",
+  "description": "FlowSearch 主题 token:颜色/字号/间距/圆角/阴影资源。对应 PRD §02-视觉规范.md。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {}
+}

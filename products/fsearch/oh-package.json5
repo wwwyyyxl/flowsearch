@@ -1,0 +1,20 @@
+{
+  "name": "fsearch",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@flowsearch/base": "file:../../commons/base",
+    "@flowsearch/theme": "file:../../commons/theme",
+    "@flowsearch/router": "file:../../commons/router",
+    "@flowsearch/ui": "file:../../commons/ui",
+    "@flowsearch/mockdata": "file:../../commons/mockdata",
+    "@flowsearch/home": "file:../../features/home",
+    "@flowsearch/search": "file:../../features/search",
+    "@flowsearch/web": "file:../../features/web",
+    "@flowsearch/favs": "file:../../features/favs"
+  }
+}
+

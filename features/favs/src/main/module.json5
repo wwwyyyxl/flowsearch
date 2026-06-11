@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "favs",
+    "type": "har",
+    "description": "FlowSearch favorites and history feature module",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

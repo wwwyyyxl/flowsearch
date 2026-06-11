@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "web",
+    "type": "har",
+    "description": "FlowSearch web container feature module",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

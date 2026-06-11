@@ -1,0 +1,78 @@
+{
+  "app": {
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "6.1.1(24)",
+        "compatibleSdkVersion": "6.1.1(24)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "fsearch",
+      "srcPath": "./products/fsearch",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "base",
+      "srcPath": "./commons/base"
+    },
+    {
+      "name": "theme",
+      "srcPath": "./commons/theme"
+    },
+    {
+      "name": "router",
+      "srcPath": "./commons/router"
+    },
+    {
+      "name": "ui",
+      "srcPath": "./commons/ui"
+    },
+    {
+      "name": "mockdata",
+      "srcPath": "./commons/mockdata"
+    },
+    {
+      "name": "home",
+      "srcPath": "./features/home"
+    },
+    {
+      "name": "search",
+      "srcPath": "./features/search"
+    },
+    {
+      "name": "web",
+      "srcPath": "./features/web"
+    },
+    {
+      "name": "favs",
+      "srcPath": "./features/favs"
+    }
+  ]
+}

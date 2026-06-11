@@ -1,0 +1,17 @@
+{
+  "name": "@flowsearch/search",
+  "version": "1.0.0",
+  "description": "FlowSearch 搜索(P02 SearchInput + P03 SearchResult):历史/热搜/建议/AI 速答/排序 Tab/结果流。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../../commons/base",
+    "@flowsearch/theme": "file:../../commons/theme",
+    "@flowsearch/router": "file:../../commons/router",
+    "@flowsearch/ui": "file:../../commons/ui",
+    "@flowsearch/mockdata": "file:../../commons/mockdata",
+    "@flowsearch/favs": "file:../../features/favs"
+  }
+}

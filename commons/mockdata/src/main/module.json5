@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "mockdata",
+    "type": "har",
+    "description": "FlowSearch mock dataset module",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

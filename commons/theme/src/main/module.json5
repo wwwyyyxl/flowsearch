@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "theme",
+    "type": "har",
+    "description": "FlowSearch design tokens",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+# Obfuscation rules for this HAR module.
+# Currently disabled in build-profile.json5; leave file present to satisfy hvigor.
+
+-enable-property-obfuscation
+-enable-toplevel-obfuscation

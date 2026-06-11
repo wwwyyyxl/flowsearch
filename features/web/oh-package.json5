@@ -1,0 +1,16 @@
+{
+  "name": "@flowsearch/web",
+  "version": "1.0.0",
+  "description": "FlowSearch Web 容器(P04 WebContainer):URL 拦截 + 登录态透传 + 错误页 + 返回栈。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../../commons/base",
+    "@flowsearch/theme": "file:../../commons/theme",
+    "@flowsearch/router": "file:../../commons/router",
+    "@flowsearch/ui": "file:../../commons/ui",
+    "@flowsearch/mockdata": "file:../../commons/mockdata"
+  }
+}

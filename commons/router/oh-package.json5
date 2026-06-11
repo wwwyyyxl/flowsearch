@@ -1,0 +1,10 @@
+{
+  "name": "@flowsearch/router",
+  "version": "1.0.0",
+  "description": "FlowSearch 路由表 + NavPathStack 封装。对应 PRD §03 §7 命名约定。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {}
+}
