@@ -14,7 +14,8 @@
     "@flowsearch/home": "file:../../features/home",
     "@flowsearch/search": "file:../../features/search",
     "@flowsearch/web": "file:../../features/web",
-    "@flowsearch/favs": "file:../../features/favs"
+    "@flowsearch/favs": "file:../../features/favs",
+    "@flowsearch/settings": "file:../../features/settings"
   }
 }
 

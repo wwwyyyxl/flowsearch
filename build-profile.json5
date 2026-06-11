@@ -73,6 +73,10 @@
     {
       "name": "favs",
       "srcPath": "./features/favs"
+    },
+    {
+      "name": "settings",
+      "srcPath": "./features/settings"
     }
   ]
 }

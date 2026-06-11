@@ -33,6 +33,7 @@
  */
 
 import promptAction from "@ohos.promptAction";
+import pasteboard from "@ohos.pasteboard";
 import { PageState, WebContainerData, WebInterceptRule, WebInterceptAction } from "@flowsearch/base";
 import { WebRepository } from "../repo/WebRepository";
 
@@ -70,6 +71,9 @@ export class WebContainerViewModel {
 
   /** 慢加载黄条是否显示。 */
   @Trace showSlowBar: boolean = false;
+
+  /** 更多菜单 ActionSheet 是否显示。 */
+  @Trace showMoreMenu: boolean = false;
 
   private readonly repository: WebRepository = new WebRepository();
 
@@ -235,6 +239,32 @@ export class WebContainerViewModel {
   stopLoading(): void {
     this.showSlowBar = false;
     this.clearSlowTimer();
+  }
+
+  /** 打开更多菜单。 */
+  openMoreMenu(): void {
+    this.showMoreMenu = true;
+  }
+
+  /** 关闭更多菜单。 */
+  closeMoreMenu(): void {
+    this.showMoreMenu = false;
+  }
+
+  /** 复制当前 URL 到剪贴板。 */
+  copyLink(): void {
+    const data: WebContainerData | null = this.getCurrentData();
+    if (data === null) {
+      return;
+    }
+    const pasteData: pasteboard.PasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, data.currentUrl);
+    const systemPasteboard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard();
+    systemPasteboard.setData(pasteData).then((): void => {
+      promptAction.showToast({ message: "链接已复制" });
+    }).catch((_err: object): void => {
+      promptAction.showToast({ message: "复制失败" });
+    });
+    this.showMoreMenu = false;
   }
 
   /** 错误页"重新加载":重置状态,Page 层调 webController.loadUrl(LOAD_NO_CACHE)。 */

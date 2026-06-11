@@ -17,6 +17,7 @@ import { HomePage } from "@flowsearch/home";
 import { SearchInputPage, SearchResultPage } from "@flowsearch/search";
 import { WebContainerPage } from "@flowsearch/web";
 import { FavoritesHistoryPage } from "@flowsearch/favs";
+import { SettingsPage } from "@flowsearch/settings";
 
 @Entry
 @ComponentV2
@@ -66,7 +67,10 @@ struct Index {
         navPathStack: this.navPathStack,
         defaultTab: (param as FavsHistoryArgs).tab
       })
+    } else if (name === RouteTable.SETTINGS) {
+      SettingsPage({
+        navPathStack: this.navPathStack
+      })
     }
-    // S5+ 在这里加 Settings / ToolShell / ...
   }
 }

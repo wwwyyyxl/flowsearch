@@ -1,0 +1,16 @@
+{
+  "name": "@flowsearch/settings",
+  "version": "1.0.0",
+  "description": "FlowSearch 设置页(P06 Settings):Preferences 持久化设置 + 确认弹层。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../../commons/base",
+    "@flowsearch/theme": "file:../../commons/theme",
+    "@flowsearch/router": "file:../../commons/router",
+    "@flowsearch/ui": "file:../../commons/ui",
+    "@flowsearch/favs": "file:../../features/favs"
+  }
+}

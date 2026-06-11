@@ -26,6 +26,7 @@ import { WebErrorPage } from "../components/WebErrorPage";
 import { LoginExpiredDialog } from "../components/LoginExpiredDialog";
 import { ExternalConfirmDialog } from "../components/ExternalConfirmDialog";
 import { SlowLoadBar } from "../components/SlowLoadBar";
+import { WebActionSheet } from "../components/WebActionSheet";
 
 @ComponentV2
 export struct WebContainerPage {
@@ -128,6 +129,34 @@ export struct WebContainerPage {
           onConfirmTap: (): void => {
             this.vm.confirmExternalOpen();
             // 本期 Toast 占位(真实系统应用跳转用 @ohos.ability.startAbility)
+          }
+        })
+
+        // 7. 更多菜单 ActionSheet
+        WebActionSheet({
+          visible: this.vm.showMoreMenu,
+          onCancelTap: (): void => { this.vm.closeMoreMenu(); },
+          onRefreshTap: (): void => {
+            this.vm.closeMoreMenu();
+            try {
+              const currentData: WebContainerData | null = this.vm.getCurrentData();
+              if (currentData !== null) {
+                this.controller.loadUrl(currentData.currentUrl);
+              }
+            } catch (_e) {
+              // controller 可能未初始化
+            }
+          },
+          onOpenInBrowserTap: (): void => {
+            this.vm.closeMoreMenu();
+            promptAction.showToast({ message: "在浏览器中打开(占位)" });
+          },
+          onCopyLinkTap: (): void => {
+            this.vm.copyLink();
+          },
+          onShareTap: (): void => {
+            this.vm.closeMoreMenu();
+            promptAction.showToast({ message: "分享(占位)" });
           }
         })
       }
@@ -281,9 +310,9 @@ export struct WebContainerPage {
   }
 
   /**
-   * 更多菜单(本期 Toast 占位,等 S5 Settings 接入)。
+   * 更多菜单(S5 接入 WebActionSheet)。
    */
   private showMoreMenu(): void {
-    promptAction.showToast({ message: "更多菜单:刷新/浏览器打开/复制链接/分享(待 S5)" });
+    this.vm.openMoreMenu();
   }
 }

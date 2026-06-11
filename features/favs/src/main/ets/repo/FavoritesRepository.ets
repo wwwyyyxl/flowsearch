@@ -89,6 +89,14 @@ export class FavoritesRepository {
     await PreferencesHelper.putJson(this.context, STORE_NAME, KEY_FAVORITES, JSON.stringify(filtered));
   }
 
+  /** 清空全部收藏。 */
+  async clearAll(): Promise<void> {
+    if (this.context === null) {
+      return;
+    }
+    await PreferencesHelper.putJson(this.context, STORE_NAME, KEY_FAVORITES, "[]");
+  }
+
   /** 内部:读取原始 Record 列表。 */
   private async loadRecords(): Promise<Array<FavoriteRecord>> {
     if (this.context === null) {

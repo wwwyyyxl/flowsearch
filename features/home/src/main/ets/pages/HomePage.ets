@@ -89,6 +89,15 @@ export struct HomePage {
         this.buildModeBtn("空", "empty")
         this.buildModeBtn("错", "error")
         this.buildModeBtn("慢", "slow")
+        Text("⚙设置")
+          .fontSize($r("app.float.fs_text_caption"))
+          .fontColor($r("app.color.fs_color_primary"))
+          .backgroundColor($r("app.color.fs_color_primary_tint"))
+          .borderRadius($r("app.float.fs_radius_sm"))
+          .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+          .onClick((): void => {
+            this.navPathStack.pushPath({ name: RouteTable.SETTINGS });
+          })
       }
       .width("100%")
       .padding({
