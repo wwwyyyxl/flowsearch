@@ -22,7 +22,7 @@ import promptAction from "@ohos.promptAction";
 import { SettingsRepository, SettingsData } from "../repo/SettingsRepository";
 import { CacheCalculator } from "../cache/CacheCalculator";
 import { HistoryRepository, FavoritesRepository } from "@flowsearch/favs";
-import { ThemeManager } from "@flowsearch/theme";
+import { ThemeManager, FontScaleManager } from "@flowsearch/theme";
 
 @ObservedV2
 export class SettingsViewModel {
@@ -63,6 +63,10 @@ export class SettingsViewModel {
       if (this.context !== null) {
         ThemeManager.apply(data.themeMode, this.context);
       }
+      // S10 fix:恢复上次保存的字体大小
+      if (this.context !== null) {
+        FontScaleManager.apply(data.fontSize, this.context);
+      }
     }).catch((_err: object): void => {
       // 加载失败用默认值(已经是 SettingsData 默认)
     });
@@ -79,9 +83,12 @@ export class SettingsViewModel {
     }
   }
 
-  /** S10:切换字体大小。持久化即可,实际字体缩放由系统资源机制处理。 */
+  /** S10:切换字体大小。持久化 + 立即应用缩放。 */
   changeFontSize(size: string): void {
     this.updateSetting(SettingsRepository.KEY_FONT_SIZE, size);
+    if (this.context !== null) {
+      FontScaleManager.apply(size, this.context);
+    }
   }
 
   /** 计算缓存大小。 */

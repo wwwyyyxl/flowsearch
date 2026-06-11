@@ -27,7 +27,7 @@
 
 import promptAction from "@ohos.promptAction";
 import { RouteTable } from "@flowsearch/router";
-import { ThemeManager } from "@flowsearch/theme";
+import { ThemeManager, FontScaleManager } from "@flowsearch/theme";
 import { SettingsViewModel } from "../viewmodel/SettingsViewModel";
 import { SettingsRepository } from "../repo/SettingsRepository";
 import { SettingsGroup } from "../components/SettingsGroup";
@@ -179,7 +179,7 @@ export struct SettingsPage {
         icon: "🔤",
         title: "字体大小",
         itemType: "text",
-        value: this.fontSizeLabel(this.vm.settings.fontSize),
+        value: FontScaleManager.label(this.vm.settings.fontSize),
         showDivider: false,
         onTap: (): void => { this.showFontSizePicker = true; }
       })
@@ -476,16 +476,5 @@ export struct SettingsPage {
       this.vm.changeFontSize(size);
       this.showFontSizePicker = false;
     })
-  }
-
-  /** 字体大小值 -> 中文标签。 */
-  private fontSizeLabel(size: string): string {
-    if (size === "small") {
-      return "小号";
-    }
-    if (size === "large") {
-      return "大号";
-    }
-    return "标准";
   }
 }
