@@ -21,14 +21,19 @@ import { Article, SearchSuggestion, HotSearchItem, SearchHistoryItem,
 // 历史(本期为 mock 常量;S4 接 Preferences 存储后改为读真值)
 // ============================================================================
 
+// 生成 mock 时间戳:offsetHours 小时前
+function mockTimestamp(offsetHours: number): number {
+  return new Date().getTime() - offsetHours * 3600 * 1000;
+}
+
 const SEARCH_HISTORY: Array<SearchHistoryItem> = [
-  new SearchHistoryItem("arkts 状态管理", "刚刚"),
-  new SearchHistoryItem("web 容器 拦截", "5 分钟前"),
-  new SearchHistoryItem("LazyForEach key", "30 分钟前"),
-  new SearchHistoryItem("搜索建议", "1 小时前"),
-  new SearchHistoryItem("Compose Navigation", "昨天"),
-  new SearchHistoryItem("鸿蒙 Web 登录态", "昨天"),
-  new SearchHistoryItem("OPPOSans", "2 天前")
+  new SearchHistoryItem("arkts 状态管理", "刚刚", mockTimestamp(0)),
+  new SearchHistoryItem("web 容器 拦截", "5 分钟前", mockTimestamp(0.08)),
+  new SearchHistoryItem("LazyForEach key", "30 分钟前", mockTimestamp(0.5)),
+  new SearchHistoryItem("搜索建议", "1 小时前", mockTimestamp(1)),
+  new SearchHistoryItem("Compose Navigation", "昨天", mockTimestamp(26)),
+  new SearchHistoryItem("鸿蒙 Web 登录态", "昨天", mockTimestamp(30)),
+  new SearchHistoryItem("OPPOSans", "2 天前", mockTimestamp(52))
 ];
 
 // ============================================================================
@@ -53,6 +58,15 @@ const SUGGESTIONS_FOR_ARKTS: Array<SearchSuggestion> = [
   new SearchSuggestion("s_003", "arkts decorator @State","NORMAL", false),
   new SearchSuggestion("s_004", "arkts list lazy",      "NORMAL", false),
   new SearchSuggestion("s_005", "arkts ui navigation",  "NORMAL", false)
+];
+
+/** S8:非前缀建议词(用于验证子串高亮,如输入 "nav" 命中 "Compose Navigation 教程")。 */
+const SUGGESTIONS_EXTRA: Array<SearchSuggestion> = [
+  new SearchSuggestion("s_e01", "Compose Navigation 教程",       "NORMAL", false),
+  new SearchSuggestion("s_e02", "Flutter vs ArkTS 状态管理对比",  "NORMAL", false),
+  new SearchSuggestion("s_e03", "oh-my-posh 主题配置",           "NORMAL", false),
+  new SearchSuggestion("s_e04", "HarmonyOS DataAbility 使用",    "NORMAL", false),
+  new SearchSuggestion("s_e05", "ArkUI Web 组件性能优化",        "HOT",    true )
 ];
 
 /** 通用 fallback:把当前关键词回显 + 3 条相邻关键词。 */
@@ -214,6 +228,16 @@ export class SearchMock {
     if (kw.indexOf("arkts") === 0) {
       // 前缀命中 "arkts" 用预设列表
       return SUGGESTIONS_FOR_ARKTS.slice();
+    }
+    // S8:子串匹配 -- 从 SUGGESTIONS_EXTRA 中筛选包含关键词的建议
+    const matched: Array<SearchSuggestion> = new Array();
+    for (let i = 0; i < SUGGESTIONS_EXTRA.length; i++) {
+      if (SUGGESTIONS_EXTRA[i].keyword.toLowerCase().indexOf(kw) >= 0) {
+        matched.push(SUGGESTIONS_EXTRA[i]);
+      }
+    }
+    if (matched.length > 0) {
+      return matched;
     }
     return defaultSuggestions(keyword.trim());
   }

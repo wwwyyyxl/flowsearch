@@ -2,30 +2,21 @@
  * @file FavoritesHistoryPage.ets
  * @description 收藏与历史页面(P05 FavoritesHistory)。双 Tab:收藏 / 历史。
  *
+ * S7 补全:
+ * - 历史 Tab:按时间分组(今天/昨天/本周更早/更早) + HH:mm 时间
+ * - 收藏 Tab:管理模式(多选 + 底部操作栏:全选/批量取消收藏)
+ *
  * 设计要点:
- *
- * 1. NavDestination 包裹,与 SearchInputPage / SearchResultPage 同型。
- *    @Param navPathStack 接收路由栈,@Param defaultTab 由 FavsHistoryArgs.tab 传入。
- *
- * 2. 顶栏 + Tabs 永久渲染,主体按 tab 分支:
- *    收藏 Tab:PageState 四态分发(Loading/Empty/Content/Error),Content 用 LazyForEach
- *    历史 Tab:ForEach(历史不会上千条,不需要 LazyForEach)
- *
- * 3. FavsArticleCard 自包含在 features/favs 内(避免跨 HAR import ArticleCard):
- *    只展示标题+来源+摘要+取消收藏/删除按钮。
- *
- * 4. @Builder 禁令:
- *    buildFavoritesTab / buildHistoryTab 内不声明 const,
- *    数据在 build() 体算好通过参数传入 @Builder。
- *
- * 5. Context 注入:
- *    aboutToAppear() 调 getContext(this) 传给 vm.init(),
- *    VM -> Repository -> PreferencesHelper 全链路。
+ * 1. NavDestination 包裹,@Param navPathStack 接收路由栈。
+ * 2. 收藏 Tab:PageState 四态分发,Content 用 LazyForEach。
+ * 3. 历史 Tab:分组 ForEach(按 HistoryGroup 渲染)。
+ * 4. 管理模式:isManaging 控制多选圈 + 底部操作栏。
+ * 5. Context 注入:aboutToAppear() -> vm.init(context, defaultTab)。
  */
 
 import { PageState, Article, SearchHistoryItem } from "@flowsearch/base";
 import { RouteTable, WebContainerArgs, FavsHistoryArgs } from "@flowsearch/router";
-import { FavsViewModel } from "../viewmodel/FavsViewModel";
+import { FavsViewModel, HistoryGroup } from "../viewmodel/FavsViewModel";
 import { FavsTabs } from "../components/FavsTabs";
 import { FavsArticleCard } from "../components/FavsArticleCard";
 
@@ -86,7 +77,7 @@ export struct FavoritesHistoryPage {
   }
 
   // ============================================================
-  // 收藏 Tab(PageState 四态分发)
+  // 收藏 Tab(PageState 四态分发 + 管理模式)
   // ============================================================
   @Builder
   buildFavoritesTab() {
@@ -184,43 +175,127 @@ export struct FavoritesHistoryPage {
 
   @Builder
   buildFavContent() {
-    List() {
-      LazyForEach(
-        this.vm.favDataSource,
-        (article: Article): void => {
-          ListItem() {
-            Column() {
-              FavsArticleCard({
-                article: article,
-                showRemoveButton: true,
-                removeLabel: "取消收藏",
-                onCardTap: (a: Article): void => {
-                  this.navPathStack.pushPath({
-                    name: RouteTable.WEB_CONTAINER,
-                    param: new WebContainerArgs(a.targetUrl, a.title, false)
-                  });
-                },
-                onRemoveTap: (id: string): void => { this.vm.removeFavorite(id); }
-              })
-              Divider()
-                .strokeWidth(1)
-                .color($r("app.color.fs_color_border"))
-                .opacity(0.5)
-                .margin({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
+    Column() {
+      // 标题行: "全部 (N)" + "管理"/"完成"
+      Row() {
+        Text(`全部 (${this.vm.favArticles.length})`)
+          .fontSize($r("app.float.fs_text_body"))
+          .fontColor($r("app.color.fs_color_text_secondary"))
+          .layoutWeight(1)
+        Text(this.vm.isManaging ? "完成" : "管理")
+          .fontSize($r("app.float.fs_text_body"))
+          .fontColor($r("app.color.fs_color_primary"))
+          .onClick((): void => {
+            if (this.vm.isManaging) {
+              this.vm.exitManageMode();
+            } else {
+              this.vm.enterManageMode();
             }
-          }
-        },
-        (article: Article): string => `fav_${article.articleId}`
-      )
+          })
+      }
+      .width("100%")
+      .height(40)
+      .padding({
+        left: $r("app.float.fs_space_lg"),
+        right: $r("app.float.fs_space_lg")
+      })
+      .alignItems(VerticalAlign.Center)
+
+      // 收藏列表
+      List() {
+        LazyForEach(
+          this.vm.favDataSource,
+          (article: Article): void => {
+            ListItem() {
+              Row() {
+                // 管理模式:左侧多选圈
+                if (this.vm.isManaging) {
+                  Column() {
+                    Circle({ width: 24, height: 24 })
+                      .stroke(
+                        this.vm.isItemSelected(article.articleId)
+                          ? $r("app.color.fs_color_primary")
+                          : $r("app.color.fs_color_border")
+                      )
+                      .fill(
+                        this.vm.isItemSelected(article.articleId)
+                          ? $r("app.color.fs_color_primary")
+                          : Color.Transparent
+                      )
+                      .strokeWidth(2)
+                  }
+                  .width(32)
+                  .height("100%")
+                  .justifyContent(FlexAlign.Center)
+                  .onClick((): void => { this.vm.toggleSelect(article.articleId); })
+                }
+
+                // 卡片主体
+                Column() {
+                  FavsArticleCard({
+                    article: article,
+                    showRemoveButton: !this.vm.isManaging,
+                    removeLabel: "取消收藏",
+                    onCardTap: (a: Article): void => {
+                      if (this.vm.isManaging) {
+                        this.vm.toggleSelect(a.articleId);
+                      } else {
+                        this.navPathStack.pushPath({
+                          name: RouteTable.WEB_CONTAINER,
+                          param: new WebContainerArgs(a.targetUrl, a.title, false, false, a.articleId)
+                        });
+                      }
+                    },
+                    onRemoveTap: (id: string): void => { this.vm.removeFavorite(id); }
+                  })
+                  Divider()
+                    .strokeWidth(1)
+                    .color($r("app.color.fs_color_border"))
+                    .opacity(0.5)
+                    .margin({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
+                }
+                .layoutWeight(1)
+              }
+            }
+          },
+          (article: Article): string => `fav_${article.articleId}`
+        )
+      }
+      .cachedCount(5)
+      .width("100%")
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
+
+      // 管理模式底部操作栏
+      if (this.vm.isManaging) {
+        Row() {
+          Text("全选")
+            .fontSize($r("app.float.fs_text_body"))
+            .fontColor($r("app.color.fs_color_primary"))
+            .onClick((): void => { this.vm.selectAll(); })
+          Blank()
+          Text(`取消收藏 (${this.vm.selectedIds.length})`)
+            .fontSize($r("app.float.fs_text_body"))
+            .fontColor($r("app.color.fs_color_danger"))
+            .onClick((): void => { this.vm.batchRemove(); })
+        }
+        .width("100%")
+        .height(56)
+        .padding({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
+        .alignItems(VerticalAlign.Center)
+        .backgroundColor($r("app.color.fs_color_surface"))
+        .border({
+          width: { top: 1 },
+          color: $r("app.color.fs_color_border")
+        })
+      }
     }
-    .cachedCount(5)
     .width("100%")
     .height("100%")
-    .scrollBar(BarState.Off)
   }
 
   // ============================================================
-  // 历史 Tab(ForEach,不需要 LazyForEach)
+  // 历史 Tab(分组渲染)
   // ============================================================
   @Builder
   buildHistoryTab() {
@@ -277,32 +352,54 @@ export struct FavoritesHistoryPage {
         bottom: $r("app.float.fs_space_md")
       })
 
-      // 历史列表
+      // 分组历史列表
       List() {
-        ForEach(this.vm.historyItems, (item: SearchHistoryItem): void => {
+        ForEach(this.vm.historyGroups, (group: HistoryGroup): void => {
+          // 分组头
           ListItem() {
-            Row() {
-              Text(item.keyword)
-                .fontSize($r("app.float.fs_text_body"))
-                .fontColor($r("app.color.fs_color_text_primary"))
-                .layoutWeight(1)
-              Text(item.searchAt)
-                .fontSize($r("app.float.fs_text_caption"))
-                .fontColor($r("app.color.fs_color_text_tertiary"))
-              Text("✕")
-                .fontSize(14)
-                .fontColor($r("app.color.fs_color_text_tertiary"))
-                .margin({ left: $r("app.float.fs_space_md") })
-                .onClick((): void => { this.vm.removeHistoryItem(item.keyword); })
-            }
-            .width("100%")
-            .height(48)
-            .padding({
-              left: $r("app.float.fs_space_lg"),
-              right: $r("app.float.fs_space_lg")
-            })
-            .alignItems(VerticalAlign.Center)
+            Text(group.label)
+              .fontSize($r("app.float.fs_text_caption"))
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r("app.color.fs_color_text_secondary"))
+              .width("100%")
+              .height(32)
+              .padding({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
           }
+
+          // 组内历史项
+          ForEach(group.items,
+            (item: SearchHistoryItem): void => {
+              ListItem() {
+                Row() {
+                  Text("🕐")
+                    .fontSize(16)
+                    .fontColor($r("app.color.fs_color_text_tertiary"))
+                    .width(24)
+                  Text(item.keyword)
+                    .fontSize($r("app.float.fs_text_body"))
+                    .fontColor($r("app.color.fs_color_text_primary"))
+                    .layoutWeight(1)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  Text(this.formatTime(item.createdAt))
+                    .fontSize($r("app.float.fs_text_caption"))
+                    .fontColor($r("app.color.fs_color_text_tertiary"))
+                    .margin({ left: $r("app.float.fs_space_md") })
+                  Text("✕")
+                    .fontSize(14)
+                    .fontColor($r("app.color.fs_color_text_tertiary"))
+                    .margin({ left: $r("app.float.fs_space_md") })
+                    .onClick((): void => { this.vm.removeHistoryItem(item.keyword); })
+                }
+                .width("100%")
+                .height(56)
+                .padding({
+                  left: $r("app.float.fs_space_lg"),
+                  right: $r("app.float.fs_space_lg")
+                })
+                .alignItems(VerticalAlign.Center)
+              }
+            })
         })
       }
       .width("100%")
@@ -311,5 +408,18 @@ export struct FavoritesHistoryPage {
     }
     .width("100%")
     .height("100%")
+  }
+
+  /** 格式化时间戳为 HH:mm。ts=0 时返回空串(向后兼容无时间戳数据)。 */
+  private formatTime(ts: number): string {
+    if (ts <= 0) {
+      return "";
+    }
+    const d: Date = new Date(ts);
+    const h: number = d.getHours();
+    const m: number = d.getMinutes();
+    const hh: string = h < 10 ? `0${h}` : `${h}`;
+    const mm: string = m < 10 ? `0${m}` : `${m}`;
+    return `${hh}:${mm}`;
   }
 }

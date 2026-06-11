@@ -72,10 +72,12 @@ export class HotSearchItem {
 export class SearchHistoryItem {
   readonly keyword: string = "";
   readonly searchAt: string = "";
+  readonly createdAt: number = 0;
 
-  constructor(keyword: string, searchAt: string) {
+  constructor(keyword: string, searchAt: string, createdAt: number = 0) {
     this.keyword = keyword;
     this.searchAt = searchAt;
+    this.createdAt = createdAt;
   }
 }
 

@@ -31,7 +31,7 @@
  */
 
 import { PageState, Channel, HomeFeedData, Article, ToolEntry } from "@flowsearch/base";
-import { HomeRepository, HomeRepoError } from "../repo/HomeRepository";
+import { HomeRepository, HomeRepoError, FetchMoreResult } from "../repo/HomeRepository";
 import { SimulationMode } from "../repo/SimulationMode";
 import { ArticleDataSource } from "./ArticleDataSource";
 import { FavoritesRepository } from "@flowsearch/favs";
@@ -55,6 +55,15 @@ export class HomeViewModel {
 
   /** 调试用:模拟网络模式。调试浮层可改;真实接口不存在这个概念。 */
   @Trace simulationMode: SimulationMode = "normal";
+
+  /** 无限滚动:是否正在加载更多。 */
+  @Trace isLoadingMore: boolean = false;
+
+  /** 无限滚动:是否还有更多数据。 */
+  @Trace hasMore: boolean = true;
+
+  /** 每频道下一页页码(0-based)。切频道时重置。 */
+  private nextPage: Map<string, number> = new Map();
 
   /**
    * LazyForEach 用的数据源。VM 持有,UI 直接消费。
@@ -95,6 +104,9 @@ export class HomeViewModel {
       return;
     }
     this.currentChannelId = channelId;
+    // 重置分页状态
+    this.isLoadingMore = false;
+    this.hasMore = true;
     const cached = this.channelStates.get(channelId);
     // Idle 或不存在 -> 加载;Loading 中也允许重新触发(等同重试)
     if (cached === undefined || cached.isIdle()) {
@@ -112,6 +124,51 @@ export class HomeViewModel {
   /** 手动重试当前频道(StateHost 错误页的"重试"按钮回调)。 */
   retryCurrent(): void {
     this.loadFeed(this.currentChannelId);
+  }
+
+  /**
+   * 加载更多(上拉触底时调用)。
+   * 防重复:isLoadingMore 或 !hasMore 时直接返回。
+   * 拼接逻辑:取当前 Content 的 articles + 新 articles -> 更新 state + dataSource。
+   */
+  loadMore(): void {
+    if (this.isLoadingMore || !this.hasMore) {
+      return;
+    }
+    // 收藏频道不支持分页
+    if (this.currentChannelId === "fav") {
+      return;
+    }
+    this.isLoadingMore = true;
+    const page: number = this.nextPage.get(this.currentChannelId) ?? 1;
+
+    this.repository.fetchMore(this.currentChannelId, page, this.simulationMode)
+      .then((result: FetchMoreResult): void => {
+        const state = this.channelStates.get(this.currentChannelId);
+        if (state !== undefined && state.isContent()) {
+          const oldData = state.data as HomeFeedData;
+          // 拼接:旧 articles + 新 articles
+          const merged: Array<Article> = new Array();
+          for (let i = 0; i < oldData.articles.length; i++) {
+            merged.push(oldData.articles[i]);
+          }
+          for (let i = 0; i < result.articles.length; i++) {
+            merged.push(result.articles[i]);
+          }
+          const newData = new HomeFeedData(oldData.channels, oldData.quickEntries, merged);
+          this.updateState(this.currentChannelId, PageState.content(newData));
+          this.feedDataSource.setArticles(merged);
+        }
+        this.hasMore = result.hasMore;
+        // 更新 nextPage
+        const nextMap: Map<string, number> = new Map(this.nextPage);
+        nextMap.set(this.currentChannelId, page + 1);
+        this.nextPage = nextMap;
+        this.isLoadingMore = false;
+      })
+      .catch((_err: object): void => {
+        this.isLoadingMore = false;
+      });
   }
 
   /** 切换模拟模式 + 立刻重拉。调试浮层用。 */
@@ -187,6 +244,13 @@ export class HomeViewModel {
         ? PageState.empty()
         : PageState.content(data);
       this.updateState(channelId, nextState);
+
+      // 重置分页状态(首次加载后从第 1 页开始加载更多)
+      this.hasMore = true;
+      this.isLoadingMore = false;
+      const resetNext: Map<string, number> = new Map(this.nextPage);
+      resetNext.set(channelId, 1);
+      this.nextPage = resetNext;
 
       // 同步当前频道数据到 LazyForEach 数据源
       if (channelId === this.currentChannelId) {

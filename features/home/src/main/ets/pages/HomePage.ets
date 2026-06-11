@@ -175,7 +175,7 @@ export struct HomePage {
               onCardClick: (a: Article): void => {
                 this.navPathStack.pushPath({
                   name: RouteTable.WEB_CONTAINER,
-                  param: new WebContainerArgs(a.targetUrl, a.title, false)
+                  param: new WebContainerArgs(a.targetUrl, a.title, false, false, a.articleId)
                 });
               },
               onFavoriteToggle: (id: string): void => { this.vm.toggleFavorite(id); }
@@ -185,6 +185,31 @@ export struct HomePage {
         },
         (article: Article): string => `${article.channelId}_${article.articleId}`
       )
+
+      // 底部:LoadingMore / End
+      ListItem() {
+        if (this.vm.isLoadingMore) {
+          Row({ space: 8 }) {
+            LoadingProgress()
+              .width(20)
+              .height(20)
+              .color($r("app.color.fs_color_primary"))
+            Text("加载中")
+              .fontSize($r("app.float.fs_text_caption"))
+              .fontColor($r("app.color.fs_color_text_tertiary"))
+          }
+          .width("100%")
+          .height(56)
+          .justifyContent(FlexAlign.Center)
+        } else if (!this.vm.hasMore) {
+          Text("没有更多了")
+            .fontSize($r("app.float.fs_text_caption"))
+            .fontColor($r("app.color.fs_color_text_tertiary"))
+            .width("100%")
+            .height(56)
+            .textAlign(TextAlign.Center)
+        }
+      }
     }
     .cachedCount(5)
     .width("100%")
@@ -196,6 +221,7 @@ export struct HomePage {
       bottom: $r("app.float.fs_space_md")
     })
     .scrollBar(BarState.Off)
+    .onReachEnd((): void => { this.vm.loadMore(); })
   }
 
   /** 调试浮层按钮工厂。 */

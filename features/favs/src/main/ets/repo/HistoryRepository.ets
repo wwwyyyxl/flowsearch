@@ -52,7 +52,8 @@ export class HistoryRepository {
       const entry = arr[i] as HistoryEntry;
       items.push(new SearchHistoryItem(
         typeof entry.keyword === "string" ? entry.keyword : "",
-        typeof entry.searchAt === "string" ? entry.searchAt : "刚刚"
+        typeof entry.searchAt === "string" ? entry.searchAt : "刚刚",
+        typeof entry.createdAt === "number" ? entry.createdAt as number : 0
       ));
     }
     return items;

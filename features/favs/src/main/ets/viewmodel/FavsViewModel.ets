@@ -23,6 +23,18 @@ import { FavoritesRepository } from "../repo/FavoritesRepository";
 import { HistoryRepository } from "../repo/HistoryRepository";
 import { FavsArticleDataSource } from "./FavsArticleDataSource";
 
+/** 历史时间分组。@ObservedV2 保证 items 变化时 UI 自动重渲。 */
+@ObservedV2
+export class HistoryGroup {
+  @Trace label: string = "";
+  @Trace items: Array<SearchHistoryItem> = new Array();
+
+  constructor(label: string, items: Array<SearchHistoryItem>) {
+    this.label = label;
+    this.items = items;
+  }
+}
+
 @ObservedV2
 export class FavsViewModel {
   /** 当前 Tab:"favorites" | "history"。 */
@@ -34,11 +46,21 @@ export class FavsViewModel {
   /** 搜索历史列表(内存态)。 */
   @Trace historyItems: Array<SearchHistoryItem> = new Array();
 
+  /** 历史分组(按时间:今天/昨天/本周更早/更早)。 */
+  @Trace historyGroups: Array<HistoryGroup> = new Array();
+
   /** 收藏 Tab 的加载状态。 */
   @Trace favState: PageState = PageState.idle();
 
   /** 历史 Tab 的加载状态。 */
   @Trace historyState: PageState = PageState.idle();
+
+  // ========== 收藏管理模式(PRD §04-05) ==========
+  /** 是否处于管理模式。 */
+  @Trace isManaging: boolean = false;
+
+  /** 管理模式下已选中的文章 id 列表。 */
+  @Trace selectedIds: Array<string> = new Array();
 
   /** LazyForEach 数据源(收藏 Tab 用)。 */
   readonly favDataSource: FavsArticleDataSource = new FavsArticleDataSource();
@@ -96,11 +118,13 @@ export class FavsViewModel {
     this.historyState = PageState.loading();
     this.historyRepo.loadAll().then((items: Array<SearchHistoryItem>): void => {
       this.historyItems = items;
+      this.historyGroups = this.groupHistory(items);
       this.historyState = items.length === 0
         ? PageState.empty()
         : PageState.content(items);
     }).catch((_err: object): void => {
       this.historyItems = new Array();
+      this.historyGroups = new Array();
       this.historyState = PageState.error("LOAD_ERR", "加载历史失败");
     });
   }
@@ -132,6 +156,7 @@ export class FavsViewModel {
       }
     }
     this.historyItems = next;
+    this.historyGroups = this.groupHistory(next);
     if (next.length === 0) {
       this.historyState = PageState.empty();
     }
@@ -147,7 +172,124 @@ export class FavsViewModel {
   /** 清空全部历史。 */
   clearAllHistory(): void {
     this.historyItems = new Array();
+    this.historyGroups = new Array();
     this.historyState = PageState.empty();
     this.historyRepo.clearAll();
+  }
+
+  // ========== 收藏管理模式 ==========
+
+  /** 进入管理模式。 */
+  enterManageMode(): void {
+    this.isManaging = true;
+    this.selectedIds = new Array();
+  }
+
+  /** 退出管理模式。 */
+  exitManageMode(): void {
+    this.isManaging = false;
+    this.selectedIds = new Array();
+  }
+
+  /** 切换某文章的选中态。 */
+  toggleSelect(articleId: string): void {
+    const idx: number = this.selectedIds.indexOf(articleId);
+    const next: Array<string> = new Array();
+    for (let i = 0; i < this.selectedIds.length; i++) {
+      if (i !== idx) {
+        next.push(this.selectedIds[i]);
+      }
+    }
+    if (idx < 0) {
+      next.push(articleId);
+    }
+    this.selectedIds = next;
+  }
+
+  /** 判断某文章是否已选中。 */
+  isItemSelected(articleId: string): boolean {
+    return this.selectedIds.indexOf(articleId) >= 0;
+  }
+
+  /** 全选。 */
+  selectAll(): void {
+    const all: Array<string> = new Array();
+    for (let i = 0; i < this.favArticles.length; i++) {
+      all.push(this.favArticles[i].articleId);
+    }
+    this.selectedIds = all;
+  }
+
+  /** 批量取消收藏。 */
+  batchRemove(): void {
+    for (let i = 0; i < this.selectedIds.length; i++) {
+      this.removeFavorite(this.selectedIds[i]);
+    }
+    this.exitManageMode();
+  }
+
+  // ========== 历史时间分组 ==========
+
+  /**
+   * 将历史项按时间分组:今天 / 昨天 / 本周更早 / 更早。
+   * createdAt 为 0 的项归入"更早"(向后兼容无时间戳数据)。
+   */
+  private groupHistory(items: Array<SearchHistoryItem>): Array<HistoryGroup> {
+    const now: number = new Date().getTime();
+    // 今天 00:00
+    const todayStart: number = FavsViewModel.startOfDay(now);
+    // 昨天 00:00
+    const yesterdayStart: number = todayStart - 24 * 3600 * 1000;
+    // 本周一 00:00
+    const weekStart: number = FavsViewModel.startOfWeek(now);
+
+    const todayItems: Array<SearchHistoryItem> = new Array();
+    const yesterdayItems: Array<SearchHistoryItem> = new Array();
+    const weekItems: Array<SearchHistoryItem> = new Array();
+    const olderItems: Array<SearchHistoryItem> = new Array();
+
+    for (let i = 0; i < items.length; i++) {
+      const ts: number = items[i].createdAt;
+      if (ts >= todayStart) {
+        todayItems.push(items[i]);
+      } else if (ts >= yesterdayStart) {
+        yesterdayItems.push(items[i]);
+      } else if (ts >= weekStart) {
+        weekItems.push(items[i]);
+      } else {
+        olderItems.push(items[i]);
+      }
+    }
+
+    const groups: Array<HistoryGroup> = new Array();
+    if (todayItems.length > 0) {
+      groups.push(new HistoryGroup("今天", todayItems));
+    }
+    if (yesterdayItems.length > 0) {
+      groups.push(new HistoryGroup("昨天", yesterdayItems));
+    }
+    if (weekItems.length > 0) {
+      groups.push(new HistoryGroup("本周更早", weekItems));
+    }
+    if (olderItems.length > 0) {
+      groups.push(new HistoryGroup("更早", olderItems));
+    }
+    return groups;
+  }
+
+  /** 取某时间戳当天 00:00 的毫秒数。 */
+  private static startOfDay(ts: number): number {
+    const d: Date = new Date(ts);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }
+
+  /** 取某时间戳所在周一 00:00 的毫秒数。 */
+  private static startOfWeek(ts: number): number {
+    const d: Date = new Date(ts);
+    d.setHours(0, 0, 0, 0);
+    const day: number = d.getDay(); // 0=Sun,1=Mon,...
+    const diff: number = day === 0 ? 6 : day - 1; // 距周一的天数
+    return d.getTime() - diff * 24 * 3600 * 1000;
   }
 }

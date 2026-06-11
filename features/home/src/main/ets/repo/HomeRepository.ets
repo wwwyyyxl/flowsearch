@@ -28,9 +28,12 @@
  *    S2 接 commons/network 后,Repository 升级为调 MockApiClient,签名不变。
  */
 
-import { HomeFeedData } from "@flowsearch/base";
+import { HomeFeedData, Article } from "@flowsearch/base";
 import { HomeMock } from "@flowsearch/mockdata";
 import { SimulationMode } from "./SimulationMode";
+
+/** Mock 分页:每页条数。 */
+const PAGE_SIZE: number = 3;
 
 /** Mock 网络延时(毫秒)。 */
 const DELAY_NORMAL_MS: number = 200;
@@ -44,6 +47,17 @@ export class HomeRepoError extends Error {
   constructor(errorCode: string, message: string) {
     super(message);
     this.errorCode = errorCode;
+  }
+}
+
+/** fetchMore 返回值。 */
+export class FetchMoreResult {
+  readonly articles: Array<Article> = new Array();
+  readonly hasMore: boolean = true;
+
+  constructor(articles: Array<Article>, hasMore: boolean) {
+    this.articles = articles;
+    this.hasMore = hasMore;
   }
 }
 
@@ -75,6 +89,36 @@ export class HomeRepository {
 
     // normal / slow 都走正常数据(slow 只是延时长一点)
     return HomeMock.getHomeFeed(channelId);
+  }
+
+  /**
+   * Mock 分页:取指定频道的第 page 页文章(0-based)。
+   * 模拟网络延时后按 PAGE_SIZE 分片返回。
+   *
+   * @param channelId 频道 id
+   * @param page      页码(0-based)
+   * @param mode      模拟模式
+   * @returns         { articles: 本页文章, hasMore: 是否还有下一页 }
+   */
+  async fetchMore(
+    channelId: string,
+    page: number,
+    mode: SimulationMode
+  ): Promise<FetchMoreResult> {
+    const delayMs: number = HomeRepository.pickDelay(mode);
+    await HomeRepository.sleep(delayMs);
+
+    if (mode === "error") {
+      throw new HomeRepoError("500", "加载更多失败");
+    }
+
+    const all: Array<Article> = HomeMock.getArticles(channelId);
+    const start: number = page * PAGE_SIZE;
+    const end: number = Math.min(start + PAGE_SIZE, all.length);
+    const articles: Array<Article> = all.slice(start, end);
+    const hasMore: boolean = end < all.length;
+
+    return new FetchMoreResult(articles, hasMore);
   }
 
   /** 按模式映射延时。集中一处,方便调参。 */
