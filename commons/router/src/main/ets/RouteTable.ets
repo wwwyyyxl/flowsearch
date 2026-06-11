@@ -33,6 +33,8 @@ export class RouteTable {
   static readonly FAVORITES_HISTORY: string = "favs";
   static readonly SETTINGS: string = "settings";
   static readonly TOOL_SHELL: string = "tool.shell";
+  static readonly USER_AGREEMENT: string = "settings.agreement";
+  static readonly PRIVACY_POLICY: string = "settings.privacy";
 
   // 路由参数 key(各页面通过 NavPathStack.getParamByName 取)
   static readonly PARAM_KEYWORD: string = "keyword";

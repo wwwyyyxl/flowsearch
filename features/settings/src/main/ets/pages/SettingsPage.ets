@@ -47,6 +47,9 @@ export struct SettingsPage {
   /** S9:主题选择弹层。 */
   @Local showThemePicker: boolean = false;
 
+  /** S10:字体大小选择弹层。 */
+  @Local showFontSizePicker: boolean = false;
+
   aboutToAppear(): void {
     this.vm.init(getContext(this));
   }
@@ -118,6 +121,9 @@ export struct SettingsPage {
 
         // ===== S9:主题选择弹层 =====
         this.buildThemePicker()
+
+        // ===== S10:字体大小选择弹层 =====
+        this.buildFontSizePicker()
       }
       .width("100%")
       .height("100%")
@@ -173,9 +179,9 @@ export struct SettingsPage {
         icon: "🔤",
         title: "字体大小",
         itemType: "text",
-        value: this.vm.settings.fontSize === "standard" ? "标准" : this.vm.settings.fontSize,
+        value: this.fontSizeLabel(this.vm.settings.fontSize),
         showDivider: false,
-        onTap: (): void => { promptAction.showToast({ message: "字体大小(占位)" }); }
+        onTap: (): void => { this.showFontSizePicker = true; }
       })
     }
   }
@@ -293,14 +299,14 @@ export struct SettingsPage {
         title: "用户协议",
         itemType: "action",
         showDivider: true,
-        onTap: (): void => { promptAction.showToast({ message: "用户协议(占位)" }); }
+        onTap: (): void => { this.navPathStack.pushPath({ name: RouteTable.USER_AGREEMENT }); }
       })
       SettingsItem({
         icon: "🔐",
         title: "隐私政策",
         itemType: "action",
         showDivider: true,
-        onTap: (): void => { promptAction.showToast({ message: "隐私政策(占位)" }); }
+        onTap: (): void => { this.navPathStack.pushPath({ name: RouteTable.PRIVACY_POLICY }); }
       })
       SettingsItem({
         icon: "💡",
@@ -390,5 +396,96 @@ export struct SettingsPage {
       this.vm.changeThemeMode(mode);
       this.showThemePicker = false;
     })
+  }
+
+  // ============================================================
+  // S10:字体大小选择弹层
+  // ============================================================
+  @Builder
+  buildFontSizePicker() {
+    if (this.showFontSizePicker) {
+      Stack({ alignContent: Alignment.Bottom }) {
+        Column()
+          .width("100%")
+          .height("100%")
+          .backgroundColor("rgba(0,0,0,0.4)")
+          .onClick((): void => { this.showFontSizePicker = false; })
+
+        Column() {
+          Text("字体大小")
+            .fontSize($r("app.float.fs_text_title_2"))
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .width("100%")
+            .textAlign(TextAlign.Center)
+            .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
+
+          Column() {
+            this.buildFontSizeOption("小号", "small")
+            Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
+            this.buildFontSizeOption("标准", "standard")
+            Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
+            this.buildFontSizeOption("大号", "large")
+          }
+          .width("100%")
+          .borderRadius($r("app.float.fs_radius_lg"))
+          .backgroundColor($r("app.color.fs_color_surface"))
+          .clip(true)
+
+          Text("取消")
+            .fontSize($r("app.float.fs_text_body_lg"))
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .textAlign(TextAlign.Center)
+            .width("100%")
+            .height($r("app.float.fs_height_button"))
+            .backgroundColor($r("app.color.fs_color_surface"))
+            .borderRadius($r("app.float.fs_radius_lg"))
+            .margin({ top: 8 })
+            .onClick((): void => { this.showFontSizePicker = false; })
+        }
+        .width("100%")
+        .padding({
+          left: $r("app.float.fs_space_lg"),
+          right: $r("app.float.fs_space_lg"),
+          bottom: $r("app.float.fs_space_3xl")
+        })
+      }
+      .width("100%")
+      .height("100%")
+    }
+  }
+
+  @Builder
+  buildFontSizeOption(label: string, size: string) {
+    Row() {
+      Text(label)
+        .fontSize($r("app.float.fs_text_body_lg"))
+        .fontColor($r("app.color.fs_color_text_primary"))
+        .layoutWeight(1)
+      if (this.vm.settings.fontSize === size) {
+        Text("✓")
+          .fontSize(18)
+          .fontColor($r("app.color.fs_color_primary"))
+      }
+    }
+    .width("100%")
+    .height($r("app.float.fs_height_list_single"))
+    .padding({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
+    .alignItems(VerticalAlign.Center)
+    .onClick((): void => {
+      this.vm.changeFontSize(size);
+      this.showFontSizePicker = false;
+    })
+  }
+
+  /** 字体大小值 -> 中文标签。 */
+  private fontSizeLabel(size: string): string {
+    if (size === "small") {
+      return "小号";
+    }
+    if (size === "large") {
+      return "大号";
+    }
+    return "标准";
   }
 }

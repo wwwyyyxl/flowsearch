@@ -79,6 +79,11 @@ export class SettingsViewModel {
     }
   }
 
+  /** S10:切换字体大小。持久化即可,实际字体缩放由系统资源机制处理。 */
+  changeFontSize(size: string): void {
+    this.updateSetting(SettingsRepository.KEY_FONT_SIZE, size);
+  }
+
   /** 计算缓存大小。 */
   private loadCacheSize(): void {
     if (this.context === null) {

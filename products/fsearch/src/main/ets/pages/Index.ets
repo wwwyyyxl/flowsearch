@@ -17,7 +17,7 @@ import { HomePage } from "@flowsearch/home";
 import { SearchInputPage, SearchResultPage } from "@flowsearch/search";
 import { WebContainerPage } from "@flowsearch/web";
 import { FavoritesHistoryPage } from "@flowsearch/favs";
-import { SettingsPage } from "@flowsearch/settings";
+import { SettingsPage, UserAgreementPage, PrivacyPolicyPage } from "@flowsearch/settings";
 import { ToolShellPage } from "@flowsearch/toolshell";
 
 @Entry
@@ -61,7 +61,8 @@ struct Index {
         url: (param as WebContainerArgs).url,
         title: (param as WebContainerArgs).title,
         needTokenInject: (param as WebContainerArgs).needTokenInject,
-        forceAllow: (param as WebContainerArgs).forceAllow
+        forceAllow: (param as WebContainerArgs).forceAllow,
+        articleId: (param as WebContainerArgs).articleId
       })
     } else if (name === RouteTable.FAVORITES_HISTORY) {
       FavoritesHistoryPage({
@@ -77,6 +78,10 @@ struct Index {
         navPathStack: this.navPathStack,
         toolId: (param as ToolShellArgs).toolId
       })
+    } else if (name === RouteTable.USER_AGREEMENT) {
+      UserAgreementPage({ navPathStack: this.navPathStack })
+    } else if (name === RouteTable.PRIVACY_POLICY) {
+      PrivacyPolicyPage({ navPathStack: this.navPathStack })
     }
   }
 }
