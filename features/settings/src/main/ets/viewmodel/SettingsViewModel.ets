@@ -22,6 +22,7 @@ import promptAction from "@ohos.promptAction";
 import { SettingsRepository, SettingsData } from "../repo/SettingsRepository";
 import { CacheCalculator } from "../cache/CacheCalculator";
 import { HistoryRepository, FavoritesRepository } from "@flowsearch/favs";
+import { ThemeManager } from "@flowsearch/theme";
 
 @ObservedV2
 export class SettingsViewModel {
@@ -58,9 +59,24 @@ export class SettingsViewModel {
   private loadSettings(): void {
     this.settingsRepo.loadAll().then((data: SettingsData): void => {
       this.settings = data;
+      // S9:恢复上次保存的主题模式
+      if (this.context !== null) {
+        ThemeManager.apply(data.themeMode, this.context);
+      }
     }).catch((_err: object): void => {
       // 加载失败用默认值(已经是 SettingsData 默认)
     });
+  }
+
+  /**
+   * S9:切换主题模式。持久化 + 立即应用。
+   * 与 updateSetting 分开,因为需要额外调 ThemeManager.apply。
+   */
+  changeThemeMode(mode: string): void {
+    this.updateSetting(SettingsRepository.KEY_THEME, mode);
+    if (this.context !== null) {
+      ThemeManager.apply(mode, this.context);
+    }
   }
 
   /** 计算缓存大小。 */

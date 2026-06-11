@@ -27,6 +27,7 @@
 
 import promptAction from "@ohos.promptAction";
 import { RouteTable } from "@flowsearch/router";
+import { ThemeManager } from "@flowsearch/theme";
 import { SettingsViewModel } from "../viewmodel/SettingsViewModel";
 import { SettingsRepository } from "../repo/SettingsRepository";
 import { SettingsGroup } from "../components/SettingsGroup";
@@ -42,6 +43,9 @@ export struct SettingsPage {
 
   /** 弹层描述文本(在 build() 外算好,避免 @Builder 内 const)。 */
   @Local clearDescription: string = "";
+
+  /** S9:主题选择弹层。 */
+  @Local showThemePicker: boolean = false;
 
   aboutToAppear(): void {
     this.vm.init(getContext(this));
@@ -111,6 +115,9 @@ export struct SettingsPage {
           onCancelTap: (): void => { this.vm.cancelUpdate(); },
           onUpdateTap: (): void => { this.vm.confirmUpdate(); }
         })
+
+        // ===== S9:主题选择弹层 =====
+        this.buildThemePicker()
       }
       .width("100%")
       .height("100%")
@@ -150,9 +157,9 @@ export struct SettingsPage {
         icon: "🎨",
         title: "主题模式",
         itemType: "text",
-        value: "浅色",
+        value: ThemeManager.label(this.vm.settings.themeMode),
         showDivider: true,
-        onTap: (): void => { promptAction.showToast({ message: "主题模式(占位)" }); }
+        onTap: (): void => { this.showThemePicker = true; }
       })
       SettingsItem({
         icon: "🌐",
@@ -303,5 +310,85 @@ export struct SettingsPage {
         onTap: (): void => { promptAction.showToast({ message: "反馈(占位)" }); }
       })
     }
+  }
+
+  // ============================================================
+  // S9:主题选择弹层
+  // ============================================================
+  @Builder
+  buildThemePicker() {
+    if (this.showThemePicker) {
+      Stack({ alignContent: Alignment.Bottom }) {
+        Column()
+          .width("100%")
+          .height("100%")
+          .backgroundColor("rgba(0,0,0,0.4)")
+          .onClick((): void => { this.showThemePicker = false; })
+
+        Column() {
+          Text("选择主题")
+            .fontSize($r("app.float.fs_text_title_2"))
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .width("100%")
+            .textAlign(TextAlign.Center)
+            .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
+
+          Column() {
+            this.buildThemeOption("浅色", "light")
+            Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
+            this.buildThemeOption("深色", "dark")
+            Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
+            this.buildThemeOption("跟随系统", "system")
+          }
+          .width("100%")
+          .borderRadius($r("app.float.fs_radius_lg"))
+          .backgroundColor($r("app.color.fs_color_surface"))
+          .clip(true)
+
+          Text("取消")
+            .fontSize($r("app.float.fs_text_body_lg"))
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .textAlign(TextAlign.Center)
+            .width("100%")
+            .height($r("app.float.fs_height_button"))
+            .backgroundColor($r("app.color.fs_color_surface"))
+            .borderRadius($r("app.float.fs_radius_lg"))
+            .margin({ top: 8 })
+            .onClick((): void => { this.showThemePicker = false; })
+        }
+        .width("100%")
+        .padding({
+          left: $r("app.float.fs_space_lg"),
+          right: $r("app.float.fs_space_lg"),
+          bottom: $r("app.float.fs_space_3xl")
+        })
+      }
+      .width("100%")
+      .height("100%")
+    }
+  }
+
+  @Builder
+  buildThemeOption(label: string, mode: string) {
+    Row() {
+      Text(label)
+        .fontSize($r("app.float.fs_text_body_lg"))
+        .fontColor($r("app.color.fs_color_text_primary"))
+        .layoutWeight(1)
+      if (this.vm.settings.themeMode === mode) {
+        Text("✓")
+          .fontSize(18)
+          .fontColor($r("app.color.fs_color_primary"))
+      }
+    }
+    .width("100%")
+    .height($r("app.float.fs_height_list_single"))
+    .padding({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
+    .alignItems(VerticalAlign.Center)
+    .onClick((): void => {
+      this.vm.changeThemeMode(mode);
+      this.showThemePicker = false;
+    })
   }
 }

@@ -106,24 +106,47 @@ export struct SearchInputPage {
   }
 
   // ============================================================
-  // 主体:有输入态(建议列表)
+  // 主体:有输入态(建议列表 / loading / 无建议)
   // ============================================================
   @Builder
   buildSuggestionBody() {
-    Scroll() {
+    if (this.vm.loadingSuggestions) {
+      // S9:建议加载中
       Column() {
-        SuggestionList({
-          inputKeyword: this.vm.keyword,
-          suggestions: this.vm.suggestions,
-          onItemTap: (kw: string): void => { this.commitAndNavigate(kw); },
-          onFillTap: (kw: string): void => { this.vm.fillKeywordFromSuggestion(kw); }
-        })
+        LoadingProgress()
+          .width(24)
+          .height(24)
+          .color($r("app.color.fs_color_primary"))
       }
       .width("100%")
+      .height(120)
+      .justifyContent(FlexAlign.Center)
+    } else if (this.vm.suggestions.length > 0) {
+      Scroll() {
+        Column() {
+          SuggestionList({
+            inputKeyword: this.vm.keyword,
+            suggestions: this.vm.suggestions,
+            onItemTap: (kw: string): void => { this.commitAndNavigate(kw); },
+            onFillTap: (kw: string): void => { this.vm.fillKeywordFromSuggestion(kw); }
+          })
+        }
+        .width("100%")
+      }
+      .layoutWeight(1)
+      .width("100%")
+      .scrollBar(BarState.Off)
+    } else {
+      // 无匹配建议
+      Column() {
+        Text("没有相关建议")
+          .fontSize($r("app.float.fs_text_body"))
+          .fontColor($r("app.color.fs_color_text_tertiary"))
+      }
+      .width("100%")
+      .height(120)
+      .justifyContent(FlexAlign.Center)
     }
-    .layoutWeight(1)
-    .width("100%")
-    .scrollBar(BarState.Off)
   }
 
   /**
