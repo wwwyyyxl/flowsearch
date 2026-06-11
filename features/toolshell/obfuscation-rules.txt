@@ -1,0 +1,3 @@
+# Obfuscation rules for this HAR module.
+-enable-property-obfuscation
+-enable-toplevel-obfuscation

@@ -4,12 +4,11 @@
  *
  * 设计要点(简历主线 3:LazyForEach):
  *
- * 1. ⚠️ ViewHolder 复用暂未启用:
- *    @Reusable 装饰器只支持 V1 @Component,与 @ComponentV2 不能混用;
- *    V2 对应的 @ReusableV2 SDK 6.1.1 支持度未验证,本期不上,留 S6 性能打磨阶段处理。
- *    本期数据量小(单频道 < 10 条),不复用对体验无影响。
- *    简历讲法:LazyForEach + cachedCount 即可覆盖核心性能场景,
- *    @ReusableV2 是数据量上量(500+ 条) 时的进一步优化。
+ * 1. ✅ @ReusableV2 已启用(S6 性能打磨):
+ *    @ReusableV2 + @ComponentV2 + @Param @Once 实现 ViewHolder 复用。
+ *    aboutToReuse/aboutToRecycle 生命周期钩子管理复用池。
+ *    reuseId 按 categoryTag 分 4 个池(WEB/TOOL/VIDEO/AI)。
+ *    LazyForEach key 仍用 `${channelId}_${articleId}` 跨频道不复用。
  *
  * 2. categoryTag -> 角标色映射:
  *    走 commons/theme 的 fs_color_tag_*_bg/text token,switch 集中一处;
@@ -28,9 +27,10 @@ interface CategoryStyle {
   label: string;
 }
 
+@ReusableV2
 @ComponentV2
 export struct ArticleCard {
-  @Param article: Article = new Article({
+  @Require @Param @Once article: Article = new Article({
     articleId: "",
     title: "",
     summary: "",
@@ -50,6 +50,16 @@ export struct ArticleCard {
 
   /** 点击右下"收藏"按钮回调,外抛 articleId。 */
   @Event onFavoriteToggle: (articleId: string) => void = (_id: string): void => {};
+
+  /** 复用时自动触发。@Param @Once 已自动重置为父组件新值,此处无需额外逻辑。 */
+  aboutToReuse(): void {
+    // article 自动重置
+  }
+
+  /** 进入复用池前触发。释放重型资源(图片引用等)。 */
+  aboutToRecycle(): void {
+    // ArticleCard 无重型资源,留空
+  }
 
   build() {
     Row() {

@@ -12,12 +12,13 @@
  *   pushPath({name, param}) ≈ navController.navigate(route, args)
  */
 
-import { RouteTable, SearchResultArgs, WebContainerArgs, FavsHistoryArgs } from "@flowsearch/router";
+import { RouteTable, SearchResultArgs, WebContainerArgs, FavsHistoryArgs, ToolShellArgs } from "@flowsearch/router";
 import { HomePage } from "@flowsearch/home";
 import { SearchInputPage, SearchResultPage } from "@flowsearch/search";
 import { WebContainerPage } from "@flowsearch/web";
 import { FavoritesHistoryPage } from "@flowsearch/favs";
 import { SettingsPage } from "@flowsearch/settings";
+import { ToolShellPage } from "@flowsearch/toolshell";
 
 @Entry
 @ComponentV2
@@ -70,6 +71,11 @@ struct Index {
     } else if (name === RouteTable.SETTINGS) {
       SettingsPage({
         navPathStack: this.navPathStack
+      })
+    } else if (name === RouteTable.TOOL_SHELL) {
+      ToolShellPage({
+        navPathStack: this.navPathStack,
+        toolId: (param as ToolShellArgs).toolId
       })
     }
   }

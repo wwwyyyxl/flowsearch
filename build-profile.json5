@@ -77,6 +77,10 @@
     {
       "name": "settings",
       "srcPath": "./features/settings"
+    },
+    {
+      "name": "toolshell",
+      "srcPath": "./features/toolshell"
     }
   ]
 }

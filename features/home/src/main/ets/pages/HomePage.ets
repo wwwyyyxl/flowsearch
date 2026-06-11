@@ -24,7 +24,7 @@
 import promptAction from "@ohos.promptAction";
 import { PageState, Article, HomeFeedData } from "@flowsearch/base";
 import { StateHost } from "@flowsearch/ui";
-import { RouteTable, WebContainerArgs } from "@flowsearch/router";
+import { RouteTable, WebContainerArgs, ToolShellArgs } from "@flowsearch/router";
 import { HomeViewModel } from "../viewmodel/HomeViewModel";
 import { SimulationMode } from "../repo/SimulationMode";
 import { HomeHeader } from "../components/HomeHeader";
@@ -111,7 +111,10 @@ export struct HomePage {
         QuickEntries({
           entries: this.vm.quickEntries,
           onEntryClick: (toolId: string): void => {
-            promptAction.showToast({ message: `ToolShell(${toolId}) 即将开发` });
+            this.navPathStack.pushPath({
+              name: RouteTable.TOOL_SHELL,
+              param: new ToolShellArgs(toolId)
+            });
           }
         })
       }
@@ -158,7 +161,7 @@ export struct HomePage {
    * 1. LazyForEach 而非 ForEach -- 长列表延迟创建 ViewHolder;
    * 2. cachedCount(5) -- 预创建可视区上下各 5 个,提升滚动流畅度;
    * 3. key generator 用 `${channelId}_${articleId}` -- 频道切换不复用脏 ViewHolder;
-   * 4. @ReusableV2 ViewHolder 复用留 S6 处理(SDK 6.1.1 V2 复用 API 待验证)。
+   * 4. @ReusableV2 已启用(reuseId 按 categoryTag 分 4 个复用池)。
    */
   @Builder
   buildFeed() {
@@ -177,6 +180,7 @@ export struct HomePage {
               },
               onFavoriteToggle: (id: string): void => { this.vm.toggleFavorite(id); }
             })
+            .reuse({ reuseId: (): string => article.categoryTag })
           }
         },
         (article: Article): string => `${article.channelId}_${article.articleId}`

@@ -1,0 +1,15 @@
+{
+  "name": "@flowsearch/toolshell",
+  "version": "1.0.0",
+  "description": "FlowSearch 工具壳页(P07 ToolShell):4 个工具入口共用模板。",
+  "main": "Index.ets",
+  "author": "FlowSearch",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@flowsearch/base": "file:../../commons/base",
+    "@flowsearch/theme": "file:../../commons/theme",
+    "@flowsearch/router": "file:../../commons/router",
+    "@flowsearch/ui": "file:../../commons/ui"
+  }
+}

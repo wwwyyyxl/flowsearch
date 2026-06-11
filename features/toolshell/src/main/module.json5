@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "toolshell",
+    "type": "har",
+    "description": "FlowSearch tool shell feature module",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

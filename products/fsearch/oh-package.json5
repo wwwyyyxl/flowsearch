@@ -15,7 +15,8 @@
     "@flowsearch/search": "file:../../features/search",
     "@flowsearch/web": "file:../../features/web",
     "@flowsearch/favs": "file:../../features/favs",
-    "@flowsearch/settings": "file:../../features/settings"
+    "@flowsearch/settings": "file:../../features/settings",
+    "@flowsearch/toolshell": "file:../../features/toolshell"
   }
 }
 
