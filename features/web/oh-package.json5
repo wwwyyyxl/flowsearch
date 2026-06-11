@@ -11,6 +11,7 @@
     "@flowsearch/theme": "file:../../commons/theme",
     "@flowsearch/router": "file:../../commons/router",
     "@flowsearch/ui": "file:../../commons/ui",
-    "@flowsearch/mockdata": "file:../../commons/mockdata"
+    "@flowsearch/mockdata": "file:../../commons/mockdata",
+    "@flowsearch/favs": "file:../../features/favs"
   }
 }

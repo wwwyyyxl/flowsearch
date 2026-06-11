@@ -327,7 +327,7 @@ export struct SearchResultPage {
                 onCardTap: (a: Article): void => {
                   this.navPathStack.pushPath({
                     name: RouteTable.WEB_CONTAINER,
-                    param: new WebContainerArgs(a.targetUrl, a.title, false)
+                    param: new WebContainerArgs(a.targetUrl, a.title, false, false, a.articleId)
                   });
                 },
                 onFavoriteTap: (id: string): void => { this.vm.toggleFavorite(id); }

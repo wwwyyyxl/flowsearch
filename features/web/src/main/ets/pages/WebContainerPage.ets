@@ -35,6 +35,7 @@ export struct WebContainerPage {
   @Param title: string = "";
   @Param needTokenInject: boolean = false;
   @Param forceAllow: boolean = false;
+  @Param articleId: string = "";
 
   @Local vm: WebContainerViewModel = new WebContainerViewModel();
 
@@ -45,7 +46,7 @@ export struct WebContainerPage {
   @Local isFirstLoad: boolean = true;
 
   aboutToAppear(): void {
-    this.vm.init(this.url, this.title, this.needTokenInject, this.forceAllow);
+    this.vm.init(this.url, this.title, this.needTokenInject, this.forceAllow, this.articleId, getContext(this));
   }
 
   aboutToDisappear(): void {
@@ -135,6 +136,7 @@ export struct WebContainerPage {
         // 7. 更多菜单 ActionSheet
         WebActionSheet({
           visible: this.vm.showMoreMenu,
+          isFavorited: this.vm.isFavorited,
           onCancelTap: (): void => { this.vm.closeMoreMenu(); },
           onRefreshTap: (): void => {
             this.vm.closeMoreMenu();
@@ -157,6 +159,10 @@ export struct WebContainerPage {
           onShareTap: (): void => {
             this.vm.closeMoreMenu();
             promptAction.showToast({ message: "分享(占位)" });
+          },
+          onFavoriteTap: (): void => {
+            this.vm.toggleFavorite();
+            this.vm.closeMoreMenu();
           }
         })
       }

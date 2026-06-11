@@ -34,8 +34,9 @@
 
 import promptAction from "@ohos.promptAction";
 import pasteboard from "@ohos.pasteboard";
-import { PageState, WebContainerData, WebInterceptRule, WebInterceptAction } from "@flowsearch/base";
+import { PageState, WebContainerData, WebInterceptRule, WebInterceptAction, Article } from "@flowsearch/base";
 import { WebRepository } from "../repo/WebRepository";
+import { FavoritesRepository } from "@flowsearch/favs";
 
 /** 慢加载触发阈值(PRD §04-04 §5.5)。 */
 const SLOW_THRESHOLD_MS: number = 5000;
@@ -75,7 +76,16 @@ export class WebContainerViewModel {
   /** 更多菜单 ActionSheet 是否显示。 */
   @Trace showMoreMenu: boolean = false;
 
+  /** 路由入参:文章 id,用于详情页收藏。空串表示无关联文章。 */
+  @Trace articleId: string = "";
+
+  /** 当前文章是否已收藏。 */
+  @Trace isFavorited: boolean = false;
+
   private readonly repository: WebRepository = new WebRepository();
+
+  /** 收藏持久化(S8 新增)。init(context) 时初始化。 */
+  private readonly favRepo: FavoritesRepository = new FavoritesRepository();
 
   /** 慢加载定时器句柄(setTimeout 返回值,ArkTS 是 number)。 */
   private slowTimerId: number = -1;
@@ -91,11 +101,16 @@ export class WebContainerViewModel {
    * 初始化:先把拦截规则拉起来(PageState.loading),再让 Page 加载首个 URL。
    * 规则拉取失败 -> PageState.error。
    */
-  async init(initialUrl: string, initialTitle: string, needTokenInject: boolean, forceAllow: boolean): Promise<void> {
+  async init(initialUrl: string, initialTitle: string, needTokenInject: boolean, forceAllow: boolean, articleId: string, context: Context): Promise<void> {
     this.initialUrl = initialUrl;
     this.initialTitle = initialTitle;
     this.needTokenInjectDefault = needTokenInject;
     this.forceAllow = forceAllow;
+    this.articleId = articleId;
+
+    // S8:收藏持久化初始化
+    this.favRepo.init(context);
+    this.loadFavoriteStatus();
 
     this.state = PageState.loading();
     this.progress = 0;
@@ -249,6 +264,58 @@ export class WebContainerViewModel {
   /** 关闭更多菜单。 */
   closeMoreMenu(): void {
     this.showMoreMenu = false;
+  }
+
+  /**
+   * S8:切换当前文章的收藏态。
+   * 内存即时反馈 + 异步持久化,与 HomeViewModel.toggleFavorite 同策略。
+   */
+  toggleFavorite(): void {
+    if (this.articleId.length === 0) {
+      return;
+    }
+    this.isFavorited = !this.isFavorited;
+    if (this.isFavorited) {
+      // 构造最小 Article 存入收藏
+      const article: Article = new Article({
+        articleId: this.articleId,
+        title: this.initialTitle,
+        summary: "",
+        coverUrl: null,
+        coverPlaceholder: "",
+        categoryTag: "WEB",
+        source: "",
+        publishTime: "",
+        publishTimeDisplay: "",
+        targetUrl: this.initialUrl,
+        favorite: true,
+        channelId: ""
+      });
+      this.favRepo.save(article);
+    } else {
+      this.favRepo.remove(this.articleId);
+    }
+  }
+
+  /**
+   * S8:从 Preferences 加载当前文章的收藏状态。
+   * 在 init() 中同步调用(favRepo.loadAll 是异步,但状态检查不阻塞页面加载)。
+   */
+  private loadFavoriteStatus(): void {
+    if (this.articleId.length === 0) {
+      return;
+    }
+    this.favRepo.loadAll().then((articles: Array<Article>): void => {
+      for (let i = 0; i < articles.length; i++) {
+        if (articles[i].articleId === this.articleId) {
+          this.isFavorited = true;
+          return;
+        }
+      }
+      this.isFavorited = false;
+    }).catch((_err: object): void => {
+      this.isFavorited = false;
+    });
   }
 
   /** 复制当前 URL 到剪贴板。 */

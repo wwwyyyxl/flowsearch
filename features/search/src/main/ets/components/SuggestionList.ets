@@ -3,10 +3,10 @@
  * @description 输入态建议列表。每行 56 高,左放大镜 + 中关键词(高亮)+ 右回填箭头。
  *
  * 设计要点:
- * 1. 关键词高亮:把 suggestion.keyword 按 inputKeyword 前缀切分,
- *    前缀用 primary 绿色加粗,后缀用 text.primary 默认色。
- *    本期只做前缀匹配(对应 Mock 词典实际形态:全是 "arkts xxx"),
- *    严格意义的子串高亮留作扩展练习。
+ * 1. 关键词高亮:把 suggestion.keyword 按 inputKeyword 子串切分,
+ *    匹配部分用 primary 绿色加粗,前后用 text.primary 默认色。
+ *    S8 升级:从仅前缀匹配改为任意子串匹配(如输入 "nav" 高亮
+ *    "Compose **Nav**igation 教程" 中的 "Nav")。
  *
  * 2. 行 56 高 + 1px 底分割线(PRD §04-02 §2)。
  *
@@ -49,13 +49,16 @@ export struct SuggestionList {
           .textAlign(TextAlign.Center)
           .margin({ right: $r("app.float.fs_space_md") })
 
-        // 高亮文本:前缀绿色加粗 + 后缀普通
+        // 高亮文本:子串匹配(前 + 匹配绿粗体 + 后)
         Text() {
-          Span(this.matchedPrefix(s.keyword))
+          Span(this.beforeMatch(s.keyword))
+            .fontSize($r("app.float.fs_text_body"))
+            .fontColor($r("app.color.fs_color_text_primary"))
+          Span(this.matchText(s.keyword))
             .fontSize($r("app.float.fs_text_body"))
             .fontColor($r("app.color.fs_color_primary"))
             .fontWeight(FontWeight.Bold)
-          Span(this.remainSuffix(s.keyword))
+          Span(this.afterMatch(s.keyword))
             .fontSize($r("app.float.fs_text_body"))
             .fontColor($r("app.color.fs_color_text_primary"))
           if (s.type === "HOT") {
@@ -91,30 +94,41 @@ export struct SuggestionList {
     }
   }
 
-  /** 取 suggestion.keyword 的前缀(命中 inputKeyword 的部分)。 */
-  private matchedPrefix(full: string): string {
+  /** 子串匹配起始位置(-1 = 未命中)。大小写不敏感。 */
+  private matchStartIndex(full: string): number {
     const kw: string = this.inputKeyword.trim().toLowerCase();
     if (kw.length === 0) {
-      return "";
+      return -1;
     }
-    const lower: string = full.toLowerCase();
-    if (lower.indexOf(kw) === 0) {
-      // 前缀命中:返回原 full 的对应字符数(保留大小写 / 中文)
-      return full.substring(0, kw.length);
-    }
-    return "";
+    return full.toLowerCase().indexOf(kw);
   }
 
-  /** 取 suggestion.keyword 去掉高亮前缀后剩下的部分。 */
-  private remainSuffix(full: string): string {
-    const kw: string = this.inputKeyword.trim().toLowerCase();
-    if (kw.length === 0) {
+  /** 匹配子串之前的文本。 */
+  private beforeMatch(full: string): string {
+    const idx: number = this.matchStartIndex(full);
+    if (idx <= 0) {
+      return "";
+    }
+    return full.substring(0, idx);
+  }
+
+  /** 匹配的子串(保留原始大小写)。 */
+  private matchText(full: string): string {
+    const idx: number = this.matchStartIndex(full);
+    if (idx < 0) {
+      return "";
+    }
+    const kw: string = this.inputKeyword.trim();
+    return full.substring(idx, idx + kw.length);
+  }
+
+  /** 匹配子串之后的文本。 */
+  private afterMatch(full: string): string {
+    const idx: number = this.matchStartIndex(full);
+    if (idx < 0) {
       return full;
     }
-    const lower: string = full.toLowerCase();
-    if (lower.indexOf(kw) === 0) {
-      return full.substring(kw.length);
-    }
-    return full;
+    const kw: string = this.inputKeyword.trim();
+    return full.substring(idx + kw.length);
   }
 }

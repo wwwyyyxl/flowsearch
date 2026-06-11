@@ -17,11 +17,13 @@
 @ComponentV2
 export struct WebActionSheet {
   @Param visible: boolean = false;
+  @Param isFavorited: boolean = false;
   @Event onCancelTap: () => void = (): void => {};
   @Event onRefreshTap: () => void = (): void => {};
   @Event onOpenInBrowserTap: () => void = (): void => {};
   @Event onCopyLinkTap: () => void = (): void => {};
   @Event onShareTap: () => void = (): void => {};
+  @Event onFavoriteTap: () => void = (): void => {};
 
   build() {
     if (this.visible) {
@@ -44,6 +46,12 @@ export struct WebActionSheet {
             this.buildActionItem("📋", "复制链接", (): void => { this.onCopyLinkTap(); })
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
             this.buildActionItem("↗", "分享", (): void => { this.onShareTap(); })
+            Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
+            this.buildActionItem(
+              this.isFavorited ? "⭐" : "☆",
+              this.isFavorited ? "取消收藏" : "收藏",
+              (): void => { this.onFavoriteTap(); }
+            )
           }
           .width("100%")
           .borderRadius($r("app.float.fs_radius_lg"))

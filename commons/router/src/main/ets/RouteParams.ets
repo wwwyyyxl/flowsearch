@@ -35,12 +35,15 @@ export class WebContainerArgs {
    * 调试 / 信任域名预览用。本期 mock 入口不触发,留位等真链。
    */
   readonly forceAllow: boolean = false;
+  /** 文章 id,用于详情页收藏/取消收藏。空串表示无关联文章(向后兼容)。 */
+  readonly articleId: string = "";
 
-  constructor(url: string, title: string, needTokenInject: boolean, forceAllow: boolean = false) {
+  constructor(url: string, title: string, needTokenInject: boolean, forceAllow: boolean = false, articleId: string = "") {
     this.url = url;
     this.title = title;
     this.needTokenInject = needTokenInject;
     this.forceAllow = forceAllow;
+    this.articleId = articleId;
   }
 }
 
