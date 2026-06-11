@@ -83,7 +83,7 @@ export class FavsViewModel {
       this.favDataSource.setArticles(articles);
       this.favState = articles.length === 0
         ? PageState.empty()
-        : PageState.content(null);
+        : PageState.content(articles);
     }).catch((_err: object): void => {
       this.favArticles = new Array();
       this.favDataSource.setArticles(new Array());
@@ -98,7 +98,7 @@ export class FavsViewModel {
       this.historyItems = items;
       this.historyState = items.length === 0
         ? PageState.empty()
-        : PageState.content(null);
+        : PageState.content(items);
     }).catch((_err: object): void => {
       this.historyItems = new Array();
       this.historyState = PageState.error("LOAD_ERR", "加载历史失败");

@@ -35,4 +35,4 @@ export type {
 
 // ===== Persistence 域(S4 新增) =====
 export { PreferencesHelper } from "./src/main/ets/persistence/PreferencesHelper";
-export { FavoriteRecord } from "./src/main/ets/persistence/FavoriteRecord";
+export { FavoriteRecord } from "./src/main/ets/types/FavoriteRecord";

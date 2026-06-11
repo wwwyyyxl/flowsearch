@@ -23,7 +23,7 @@
  *    toArticle:   读取时 FavoriteRecord -> Article 渲染到 UI(favorite=true)
  */
 
-import { Article, ArticleInit } from "../types/HomeModels";
+import { Article, ArticleInit } from "./HomeModels";
 
 export class FavoriteRecord {
   readonly articleId: string = "";
