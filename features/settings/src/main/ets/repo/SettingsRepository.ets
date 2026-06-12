@@ -31,7 +31,7 @@ const KEY_BROWSER: string = "default_browser";
 /** @ObservedV2 设置数据模型,UI 可直接绑定 @Trace 字段。 */
 @ObservedV2
 export class SettingsData {
-  @Trace themeMode: string = "light";
+  @Trace themeMode: string = "system";
   @Trace language: string = "zh-CN";
   @Trace fontSize: string = "standard";
   @Trace personalizedRecommend: boolean = true;

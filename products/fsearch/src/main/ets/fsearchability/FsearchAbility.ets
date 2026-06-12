@@ -13,15 +13,19 @@ export default class FsearchAbility extends UIAbility {
   private pendingDeepLinkUri: string = "";
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    // S9 fix:启动时恢复用户保存的主题偏好(不再硬编码 COLOR_MODE_NOT_SET)
+    // 先同步设置跟随系统(确保 loadContent 前已生效)
+    try {
+      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+    } catch (_e) {}
+
+    // 异步读取用户保存的主题偏好,读到后覆盖
     try {
       const ctx: Context = this.context;
       PreferencesHelper.getJson(ctx, "fsearch_settings", "theme_mode").then((val: string | null): void => {
         const mode: string = val !== null ? val : "system";
         ThemeManager.apply(mode, ctx);
       }).catch((): void => {
-        // Preferences 读取失败 → 跟随系统
-        ctx.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+        // 读取失败,保持 COLOR_MODE_NOT_SET(跟随系统)
       });
     } catch (err) {
       hilog.error(DOMAIN, TAG, 'Failed to restore theme. Cause: %{public}s', JSON.stringify(err));
