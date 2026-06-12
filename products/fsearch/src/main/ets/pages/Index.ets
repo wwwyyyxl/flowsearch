@@ -30,6 +30,42 @@ struct Index {
    */
   @Local navPathStack: NavPathStack = new NavPathStack();
 
+  aboutToAppear(): void {
+    // S14:检查是否有待处理的深链(FsearchAbility 通过 AppStorage 桥接)
+    const dlRoute: string | undefined = AppStorage.get<string>("__dl_route");
+    if (dlRoute !== undefined && dlRoute.length > 0) {
+      // 清除,防止重复触发
+      AppStorage.setOrCreate<string>("__dl_route", "");
+
+      // 延迟确保 navPathStack 已就绪
+      if (dlRoute === RouteTable.WEB_CONTAINER) {
+        const url: string = AppStorage.get<string>("__dl_url") ?? "";
+        const title: string = AppStorage.get<string>("__dl_title") ?? "";
+        AppStorage.setOrCreate<string>("__dl_url", "");
+        AppStorage.setOrCreate<string>("__dl_title", "");
+        if (url.length > 0) {
+          setTimeout((): void => {
+            this.navPathStack.pushPath({
+              name: RouteTable.WEB_CONTAINER,
+              param: new WebContainerArgs(url, title, false, true)
+            });
+          }, 100);
+        }
+      } else if (dlRoute === RouteTable.SEARCH_RESULT) {
+        const keyword: string = AppStorage.get<string>("__dl_keyword") ?? "";
+        AppStorage.setOrCreate<string>("__dl_keyword", "");
+        if (keyword.length > 0) {
+          setTimeout((): void => {
+            this.navPathStack.pushPath({
+              name: RouteTable.SEARCH_RESULT,
+              param: new SearchResultArgs(keyword)
+            });
+          }, 100);
+        }
+      }
+    }
+  }
+
   build() {
     Navigation(this.navPathStack) {
       // 根页面:HomePage(首页)
