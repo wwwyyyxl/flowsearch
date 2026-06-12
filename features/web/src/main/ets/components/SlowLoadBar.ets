@@ -33,7 +33,7 @@ export struct SlowLoadBar {
       }
       .width("100%")
       .height(32)
-      .backgroundColor("#FEF3C7")
+      .backgroundColor($r("app.color.fs_color_offline_bar_bg"))
       .padding({
         left: $r("app.float.fs_space_lg"),
         right: $r("app.float.fs_space_sm")

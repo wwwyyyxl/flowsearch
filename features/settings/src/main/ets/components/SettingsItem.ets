@@ -84,7 +84,7 @@ export struct SettingsItem {
   buildSwitchRight() {
     Toggle({ type: ToggleType.Switch, isOn: this.switchOn })
       .selectedColor($r("app.color.fs_color_primary"))
-      .switchPointColor(Color.White)
+      .switchPointColor($r("app.color.fs_color_text_inverse"))
       .onChange((isOn: boolean): void => {
         this.onSwitchChange(isOn);
       })
