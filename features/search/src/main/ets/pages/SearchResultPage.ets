@@ -64,7 +64,7 @@ export struct SearchResultPage {
   @Local vm: SearchResultViewModel = new SearchResultViewModel();
 
   aboutToAppear(): void {
-    this.vm.init(this.keyword);
+    this.vm.init(this.keyword, getContext(this));
   }
 
   build() {

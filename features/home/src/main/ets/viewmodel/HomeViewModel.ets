@@ -62,6 +62,9 @@ export class HomeViewModel {
   /** 无限滚动:是否还有更多数据。 */
   @Trace hasMore: boolean = true;
 
+  /** S11:收藏频道脏标记。其他频道 toggle 收藏后设 true,切到"fav"时强制重拉。 */
+  @Trace favDirty: boolean = false;
+
   /** 每频道下一页页码(0-based)。切频道时重置。 */
   private nextPage: Map<string, number> = new Map();
 
@@ -107,6 +110,18 @@ export class HomeViewModel {
     // 重置分页状态
     this.isLoadingMore = false;
     this.hasMore = true;
+
+    // S11:收藏频道脏标记 -> 清除缓存强制重拉
+    if (channelId === "fav" && this.favDirty) {
+      this.favDirty = false;
+      // 删除旧 fav 缓存,让 loadFeed("fav") 重新从 Preferences 读取
+      const cleared: Map<string, PageState> = new Map(this.channelStates);
+      cleared.delete("fav");
+      this.channelStates = cleared;
+      this.loadFeed("fav");
+      return;
+    }
+
     const cached = this.channelStates.get(channelId);
     // Idle 或不存在 -> 加载;Loading 中也允许重新触发(等同重试)
     if (cached === undefined || cached.isIdle()) {
@@ -208,6 +223,10 @@ export class HomeViewModel {
         this.favRepo.save(article);
       } else {
         this.favRepo.remove(articleId);
+      }
+      // S11:非"fav"频道的收藏变更标记脏,切回"fav"时重拉
+      if (this.currentChannelId !== "fav") {
+        this.favDirty = true;
       }
     }
   }

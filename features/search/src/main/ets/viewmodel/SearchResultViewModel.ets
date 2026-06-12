@@ -28,6 +28,7 @@
  */
 
 import { PageState, Article, SearchResultData, AiQuickAnswer, SortType } from "@flowsearch/base";
+import { FavoritesRepository } from "@flowsearch/favs";
 import { SearchRepository, SearchRepoError } from "../repo/SearchRepository";
 import { SimulationMode } from "../repo/SimulationMode";
 import { SearchResultDataSource } from "./SearchResultDataSource";
@@ -50,10 +51,12 @@ export class SearchResultViewModel {
   readonly dataSource: SearchResultDataSource = new SearchResultDataSource();
 
   private readonly repository: SearchRepository = new SearchRepository();
+  private readonly favRepo: FavoritesRepository = new FavoritesRepository();
 
-  /** 初始化:接收 keyword + 立即并行加载结果与 AI 速答。 */
-  init(keyword: string): void {
+  /** 初始化:接收 keyword + context + 立即并行加载结果与 AI 速答。 */
+  init(keyword: string, context: Context): void {
     this.keyword = keyword.trim();
+    this.favRepo.init(context);
     if (this.keyword.length === 0) {
       this.state = PageState.empty();
       return;
@@ -82,18 +85,33 @@ export class SearchResultViewModel {
     this.loadResults();
   }
 
-  /** 收藏 toggle:不可变更新当前 SearchResultData 里的对应 Article。 */
+  /** 收藏 toggle:不可变更新当前 SearchResultData 里的对应 Article + 持久化。 */
   toggleFavorite(articleId: string): void {
     if (!this.state.isContent()) {
       return;
     }
     const data = this.state.data as SearchResultData;
+    let toggledArticle: Article | null = null;
     const nextArticles: Array<Article> = data.articles.map((a: Article): Article => {
-      return a.articleId === articleId ? a.withFavorite(!a.favorite) : a;
+      if (a.articleId === articleId) {
+        toggledArticle = a.withFavorite(!a.favorite);
+        return toggledArticle;
+      }
+      return a;
     });
     const nextData = new SearchResultData(data.keyword, data.aiAnswer, nextArticles);
     this.state = PageState.content(nextData);
     this.dataSource.setArticles(nextArticles);
+
+    // S11:异步持久化到 FavoritesRepository
+    if (toggledArticle !== null) {
+      const article: Article = toggledArticle as Article;
+      if (article.favorite) {
+        this.favRepo.save(article);
+      } else {
+        this.favRepo.remove(articleId);
+      }
+    }
   }
 
   // ============================================================

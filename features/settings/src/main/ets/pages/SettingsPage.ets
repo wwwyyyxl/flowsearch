@@ -26,6 +26,7 @@
  */
 
 import promptAction from "@ohos.promptAction";
+import { pasteboard } from "@kit.BasicServicesKit";
 import { RouteTable } from "@flowsearch/router";
 import { ThemeManager, FontScaleManager } from "@flowsearch/theme";
 import { SettingsViewModel } from "../viewmodel/SettingsViewModel";
@@ -49,6 +50,12 @@ export struct SettingsPage {
 
   /** S10:字体大小选择弹层。 */
   @Local showFontSizePicker: boolean = false;
+
+  /** S11:语言选择弹层。 */
+  @Local showLanguagePicker: boolean = false;
+
+  /** S11:默认浏览器选择弹层。 */
+  @Local showBrowserPicker: boolean = false;
 
   aboutToAppear(): void {
     this.vm.init(getContext(this));
@@ -124,6 +131,12 @@ export struct SettingsPage {
 
         // ===== S10:字体大小选择弹层 =====
         this.buildFontSizePicker()
+
+        // ===== S11:语言选择弹层 =====
+        this.buildLanguagePicker()
+
+        // ===== S11:默认浏览器选择弹层 =====
+        this.buildBrowserPicker()
       }
       .width("100%")
       .height("100%")
@@ -171,9 +184,9 @@ export struct SettingsPage {
         icon: "🌐",
         title: "语言",
         itemType: "text",
-        value: "简体中文",
+        value: this.vm.settings.language === "zh-CN" ? "简体中文" : "English",
         showDivider: true,
-        onTap: (): void => { promptAction.showToast({ message: "语言设置(占位)" }); }
+        onTap: (): void => { this.showLanguagePicker = true; }
       })
       SettingsItem({
         icon: "🔤",
@@ -267,9 +280,9 @@ export struct SettingsPage {
         icon: "🌍",
         title: "默认浏览器",
         itemType: "text",
-        value: "系统",
+        value: this.vm.settings.defaultBrowser === "system" ? "系统默认" : "应用内打开",
         showDivider: false,
-        onTap: (): void => { promptAction.showToast({ message: "默认浏览器(占位)" }); }
+        onTap: (): void => { this.showBrowserPicker = true; }
       })
     }
   }
@@ -313,7 +326,11 @@ export struct SettingsPage {
         title: "反馈",
         itemType: "action",
         showDivider: false,
-        onTap: (): void => { promptAction.showToast({ message: "反馈(占位)" }); }
+        onTap: (): void => {
+          const pasteData = pasteboard.createData("text/plain", "feedback@flowsearch.app");
+          pasteboard.getSystemPasteboard().setData(pasteData);
+          promptAction.showToast({ message: "邮箱已复制到剪贴板" });
+        }
       })
     }
   }
@@ -475,6 +492,162 @@ export struct SettingsPage {
     .onClick((): void => {
       this.vm.changeFontSize(size);
       this.showFontSizePicker = false;
+    })
+  }
+
+  // ============================================================
+  // S11:语言选择弹层
+  // ============================================================
+  @Builder
+  buildLanguagePicker() {
+    if (this.showLanguagePicker) {
+      Stack({ alignContent: Alignment.Bottom }) {
+        Column()
+          .width("100%")
+          .height("100%")
+          .backgroundColor("rgba(0,0,0,0.4)")
+          .onClick((): void => { this.showLanguagePicker = false; })
+
+        Column() {
+          Text("选择语言")
+            .fontSize($r("app.float.fs_text_title_2"))
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .width("100%")
+            .textAlign(TextAlign.Center)
+            .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
+
+          Column() {
+            this.buildLanguageOption("简体中文", "zh-CN")
+            Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
+            this.buildLanguageOption("English", "en-US")
+          }
+          .width("100%")
+          .borderRadius($r("app.float.fs_radius_lg"))
+          .backgroundColor($r("app.color.fs_color_surface"))
+          .clip(true)
+
+          Text("取消")
+            .fontSize($r("app.float.fs_text_body_lg"))
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .textAlign(TextAlign.Center)
+            .width("100%")
+            .height($r("app.float.fs_height_button"))
+            .backgroundColor($r("app.color.fs_color_surface"))
+            .borderRadius($r("app.float.fs_radius_lg"))
+            .margin({ top: 8 })
+            .onClick((): void => { this.showLanguagePicker = false; })
+        }
+        .width("100%")
+        .padding({
+          left: $r("app.float.fs_space_lg"),
+          right: $r("app.float.fs_space_lg"),
+          bottom: $r("app.float.fs_space_3xl")
+        })
+      }
+      .width("100%")
+      .height("100%")
+    }
+  }
+
+  @Builder
+  buildLanguageOption(label: string, lang: string) {
+    Row() {
+      Text(label)
+        .fontSize($r("app.float.fs_text_body_lg"))
+        .fontColor($r("app.color.fs_color_text_primary"))
+        .layoutWeight(1)
+      if (this.vm.settings.language === lang) {
+        Text("✓")
+          .fontSize(18)
+          .fontColor($r("app.color.fs_color_primary"))
+      }
+    }
+    .width("100%")
+    .height($r("app.float.fs_height_list_single"))
+    .padding({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
+    .alignItems(VerticalAlign.Center)
+    .onClick((): void => {
+      this.vm.updateSetting(SettingsRepository.KEY_LANGUAGE, lang);
+      this.showLanguagePicker = false;
+    })
+  }
+
+  // ============================================================
+  // S11:默认浏览器选择弹层
+  // ============================================================
+  @Builder
+  buildBrowserPicker() {
+    if (this.showBrowserPicker) {
+      Stack({ alignContent: Alignment.Bottom }) {
+        Column()
+          .width("100%")
+          .height("100%")
+          .backgroundColor("rgba(0,0,0,0.4)")
+          .onClick((): void => { this.showBrowserPicker = false; })
+
+        Column() {
+          Text("默认浏览器")
+            .fontSize($r("app.float.fs_text_title_2"))
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .width("100%")
+            .textAlign(TextAlign.Center)
+            .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
+
+          Column() {
+            this.buildBrowserOption("系统默认", "system")
+            Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
+            this.buildBrowserOption("应用内打开", "inapp")
+          }
+          .width("100%")
+          .borderRadius($r("app.float.fs_radius_lg"))
+          .backgroundColor($r("app.color.fs_color_surface"))
+          .clip(true)
+
+          Text("取消")
+            .fontSize($r("app.float.fs_text_body_lg"))
+            .fontColor($r("app.color.fs_color_text_primary"))
+            .textAlign(TextAlign.Center)
+            .width("100%")
+            .height($r("app.float.fs_height_button"))
+            .backgroundColor($r("app.color.fs_color_surface"))
+            .borderRadius($r("app.float.fs_radius_lg"))
+            .margin({ top: 8 })
+            .onClick((): void => { this.showBrowserPicker = false; })
+        }
+        .width("100%")
+        .padding({
+          left: $r("app.float.fs_space_lg"),
+          right: $r("app.float.fs_space_lg"),
+          bottom: $r("app.float.fs_space_3xl")
+        })
+      }
+      .width("100%")
+      .height("100%")
+    }
+  }
+
+  @Builder
+  buildBrowserOption(label: string, browser: string) {
+    Row() {
+      Text(label)
+        .fontSize($r("app.float.fs_text_body_lg"))
+        .fontColor($r("app.color.fs_color_text_primary"))
+        .layoutWeight(1)
+      if (this.vm.settings.defaultBrowser === browser) {
+        Text("✓")
+          .fontSize(18)
+          .fontColor($r("app.color.fs_color_primary"))
+      }
+    }
+    .width("100%")
+    .height($r("app.float.fs_height_list_single"))
+    .padding({ left: $r("app.float.fs_space_lg"), right: $r("app.float.fs_space_lg") })
+    .alignItems(VerticalAlign.Center)
+    .onClick((): void => {
+      this.vm.updateSetting(SettingsRepository.KEY_BROWSER, browser);
+      this.showBrowserPicker = false;
     })
   }
 }
