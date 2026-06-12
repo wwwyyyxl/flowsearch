@@ -154,7 +154,11 @@ export struct HomePage {
         .height("100%")
       }
       .onRefreshing((): void => {
-        this.vm.refreshFeed();
+        this.vm.refreshFeed().then((): void => {
+          this.isRefreshing = false;
+        }).catch((_e: object): void => {
+          this.isRefreshing = false;
+        });
       })
       .layoutWeight(1)
       .width("100%")
