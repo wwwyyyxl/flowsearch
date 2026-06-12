@@ -36,7 +36,7 @@ import promptAction from "@ohos.promptAction";
 import pasteboard from "@ohos.pasteboard";
 import { PageState, WebContainerData, WebInterceptRule, WebInterceptAction, Article } from "@flowsearch/base";
 import { WebRepository } from "../repo/WebRepository";
-import { FavoritesRepository } from "@flowsearch/favs";
+import { FavoritesRepository, ReadingHistoryRepository } from "@flowsearch/favs";
 
 /** 慢加载触发阈值(PRD §04-04 §5.5)。 */
 const SLOW_THRESHOLD_MS: number = 5000;
@@ -87,6 +87,9 @@ export class WebContainerViewModel {
   /** 收藏持久化(S8 新增)。init(context) 时初始化。 */
   private readonly favRepo: FavoritesRepository = new FavoritesRepository();
 
+  /** 阅读历史持久化(S13 新增)。init(context) 时初始化。 */
+  private readonly readingRepo: ReadingHistoryRepository = new ReadingHistoryRepository();
+
   /** 慢加载定时器句柄(setTimeout 返回值,ArkTS 是 number)。 */
   private slowTimerId: number = -1;
 
@@ -111,6 +114,9 @@ export class WebContainerViewModel {
     // S8:收藏持久化初始化
     this.favRepo.init(context);
     this.loadFavoriteStatus();
+
+    // S13:阅读历史初始化
+    this.readingRepo.init(context);
 
     this.state = PageState.loading();
     this.progress = 0;
@@ -163,6 +169,11 @@ export class WebContainerViewModel {
   onPageEnd(_url: string): void {
     this.progress = 100;
     this.clearSlowTimer();
+    // S13:写入阅读历史(fire-and-forget,不阻塞 UI)
+    const data: WebContainerData | null = this.getCurrentData();
+    if (data !== null) {
+      this.readingRepo.add(data.currentUrl, data.displayTitle);
+    }
   }
 
   /** Web 组件报告加载错误(NETWORK / TIMEOUT / etc)。 */

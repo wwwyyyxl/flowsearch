@@ -10,3 +10,4 @@ export { FavoritesHistoryPage } from "./src/main/ets/pages/FavoritesHistoryPage"
 export { FavsViewModel } from "./src/main/ets/viewmodel/FavsViewModel";
 export { FavoritesRepository } from "./src/main/ets/repo/FavoritesRepository";
 export { HistoryRepository } from "./src/main/ets/repo/HistoryRepository";
+export { ReadingHistoryRepository } from "./src/main/ets/repo/ReadingHistoryRepository";

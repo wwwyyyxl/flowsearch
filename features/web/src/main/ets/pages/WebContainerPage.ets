@@ -54,11 +54,30 @@ export struct WebContainerPage {
   }
 
   aboutToDisappear(): void {
-    // 防内存泄漏:停止加载,释放 Web 组件(PRD §04-04 §6 性能护栏)
+    // 防内存泄漏:暂停媒体 + 停止加载,释放 Web 组件(PRD §04-04 §6 性能护栏)
     try {
+      this.controller.pauseAllMedia();
       this.controller.stop();
     } catch (_e) {
-      // 页面未加载时 stop 可能抛,吞掉
+      // 页面未加载时可能抛,吞掉
+    }
+  }
+
+  /** S13:页面重新可见(NavDestination pop 回来 / app 回前台) -> 恢复 WebView。 */
+  onPageShow(): void {
+    try {
+      this.controller.onActive();
+    } catch (_e) {
+      // controller 未关联 Web 组件时抛 17100001
+    }
+  }
+
+  /** S13:页面被遮盖(NavDestination 推入新页面 / app 进后台) -> 暂停 WebView。 */
+  onPageHide(): void {
+    try {
+      this.controller.onInactive();
+    } catch (_e) {
+      // controller 未关联 Web 组件时抛 17100001
     }
   }
 
