@@ -2,6 +2,8 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want, errorManager }
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { RouteTable } from "@flowsearch/router";
+import { ThemeManager } from "@flowsearch/theme";
+import { PreferencesHelper } from "@flowsearch/base";
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'FsearchAbility';
@@ -11,10 +13,18 @@ export default class FsearchAbility extends UIAbility {
   private pendingDeepLinkUri: string = "";
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    // S9 fix:启动时恢复用户保存的主题偏好(不再硬编码 COLOR_MODE_NOT_SET)
     try {
-      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      const ctx: Context = this.context;
+      PreferencesHelper.getJson(ctx, "fsearch_settings", "theme_mode").then((val: string | null): void => {
+        const mode: string = val !== null ? val : "system";
+        ThemeManager.apply(mode, ctx);
+      }).catch((): void => {
+        // Preferences 读取失败 → 跟随系统
+        ctx.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      });
     } catch (err) {
-      hilog.error(DOMAIN, TAG, 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
+      hilog.error(DOMAIN, TAG, 'Failed to restore theme. Cause: %{public}s', JSON.stringify(err));
     }
 
     // S12:全局异常捕获
