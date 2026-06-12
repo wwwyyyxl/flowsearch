@@ -22,6 +22,7 @@ import { SettingsRepository, SettingsData } from "../repo/SettingsRepository";
 import { CacheCalculator } from "../cache/CacheCalculator";
 import { HistoryRepository, FavoritesRepository } from "@flowsearch/favs";
 import { ThemeManager, FontScaleManager } from "@flowsearch/theme";
+import { HttpClient } from "@flowsearch/base";
 
 @ObservedV2
 export class SettingsViewModel {
@@ -69,6 +70,8 @@ export class SettingsViewModel {
       if (this.context !== null) {
         FontScaleManager.apply(data.fontSize, this.context);
       }
+      // S21:同步 API 基础地址到 HttpClient
+      HttpClient.baseUrl = data.apiBaseUrl;
     }).catch((_err: object): void => {
       // 加载失败用默认值(已经是 SettingsData 默认)
     });
@@ -125,6 +128,9 @@ export class SettingsViewModel {
       this.settings.language = value as string;
     } else if (key === SettingsRepository.KEY_BROWSER) {
       this.settings.defaultBrowser = value as string;
+    } else if (key === SettingsRepository.KEY_API_BASE_URL) {
+      this.settings.apiBaseUrl = value as string;
+      HttpClient.baseUrl = value as string;
     }
     // 磁盘异步
     this.settingsRepo.update(key, value);

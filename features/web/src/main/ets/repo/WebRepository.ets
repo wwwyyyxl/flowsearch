@@ -1,46 +1,32 @@
 /**
  * @file WebRepository.ets
- * @description Web 容器数据层。三件事:
- *
- *   1. 拉取拦截规则(/api/web/intercept-rules,PRD §07 §2.13)+ 本地 30 分钟缓存
- *   2. URL 命中规则匹配 -> 返回 WebInterceptAction 决策
- *   3. needTokenInject=true 时把 mock token 注入到请求头(返回 Authorization header value)
+ * @description Web 容器数据层。S21 升级:真实 API 优先,MockData 降级为 fallback。
  *
  * 设计要点(对齐 SearchRepository / HomeRepository 同源底线):
  *
- * 1. 零装饰器(plain class),可整段平移 Kotlin:
- *      class WebRepository {
- *        suspend fun fetchRules(forceRefresh: Boolean = false): List<WebInterceptRule>
- *        fun matchRule(url: String): WebInterceptRule?
- *        fun authHeader(): String
- *      }
+ * 1. 零装饰器(plain class),可整段平移 Kotlin。
  *
- * 2. 缓存策略:首次 fetchRules 后内存持有 + 时间戳;
- *    30 分钟内复用,过期清缓存重拉。简单可控,无需 Preferences。
- *    真接口阶段会移到 commons/network/CacheInterceptor。
+ * 2. S21 Fallback 策略(fetchRules):
+ *    ① 缓存有效 → 直接返回缓存
+ *    ② HttpClient.baseUrl 非空 → 尝试真实 API → catch 降级到 ③
+ *    ③ Mock fallback(sleep + MockData 调用)
  *
- * 3. glob -> regex:
- *    PRD pattern 用 glob(`https://mock-pay/*`、`tel:*`),ArkTS 没内置 glob 库,
- *    我们手转 RegExp:把 `.` 转义、`*` 替换成 `.*`、首尾加 `^` `$`,
- *    其他正则元字符也要转义防注入。
- *
- * 4. 错误码:
- *    - "RULES_LOAD_FAIL"   拦截规则拉取失败(VM 层会把 page state -> Error)
- *    本期 mock 不会真失败,留位给真实接口阶段。
- *
- * 5. authHeader():
- *    返回 `Bearer ${mockToken}`,供 Page 层装到 Web 组件请求头里。
- *    这是简历主线 2"登录态透传"的精确证据点。
+ * 3. matchRule / authHeader / shouldInjectToken / resolveAction 不变 — 操作缓存数据。
  */
 
 import { WebInterceptRule, WebInterceptAction } from "@flowsearch/base";
+import { HttpClient, HttpError, ApiResponse } from "@flowsearch/base";
 import { WebMock } from "@flowsearch/mockdata";
+import { hilog } from "@kit.PerformanceAnalysisKit";
 
 /** 缓存 TTL:30 分钟(PRD §07 §2.13 "启动后缓存到本地,30 分钟过期")。 */
 const RULES_CACHE_TTL_MS: number = 30 * 60 * 1000;
 
 /** 模拟首次拉规则的网络延时,体现 PageState.loading。 */
 const FETCH_RULES_DELAY_MS: number = 150;
+
+const TAG: string = "WebRepo";
+const DOMAIN: number = 0x0000;
 
 /** Repository 抛出的错误对象(沿用 SearchRepoError 风格)。 */
 export class WebRepoError extends Error {
@@ -61,7 +47,8 @@ export class WebRepository {
 
   /**
    * 拉取拦截规则。30 分钟内复用缓存,超期自动重拉。
-   * forceRefresh=true 强制走网络(调试/拉黑场景用)。
+   * forceRefresh=true 强制走网络。
+   * S21:真实 API 优先 → Mock fallback。
    */
   async fetchRules(forceRefresh: boolean = false): Promise<Array<WebInterceptRule>> {
     const now: number = Date.now();
@@ -70,10 +57,31 @@ export class WebRepository {
       && (now - this.cachedAt) < RULES_CACHE_TTL_MS;
 
     if (cacheValid) {
-      // 这里的 ! 不可避免 — ArkTS 严格类型,前一行已守 null,但不会窄化字段
       return (this.cachedRules as Array<WebInterceptRule>).slice();
     }
 
+    // 真实 API 尝试
+    if (HttpClient.baseUrl.length > 0) {
+      try {
+        const resp: ApiResponse = await HttpClient.get("/api/web/intercept-rules");
+        if (resp.data !== null) {
+          const d = resp.data as Record<string, object>;
+          const rawList = d.list as Array<object>;
+          const rules: Array<WebInterceptRule> = new Array();
+          for (let i: number = 0; i < rawList.length; i++) {
+            rules.push(WebRepository.mapRule(rawList[i]));
+          }
+          this.cachedRules = rules;
+          this.cachedAt = Date.now();
+          hilog.info(DOMAIN, TAG, "fetchRules API ok, count=%{public}d", rules.length);
+          return rules.slice();
+        }
+      } catch (err) {
+        hilog.warn(DOMAIN, TAG, "fetchRules API fallback: %{public}s", JSON.stringify(err));
+      }
+    }
+
+    // Mock fallback
     await WebRepository.sleep(FETCH_RULES_DELAY_MS);
 
     // mock 永不抛;真接口阶段失败抛 WebRepoError("RULES_LOAD_FAIL", ...)
@@ -133,6 +141,21 @@ export class WebRepository {
       return "ALLOW";
     }
     return rule.action;
+  }
+
+  // ============================================================
+  // 内部:API 响应映射
+  // ============================================================
+
+  private static mapRule(obj: object): WebInterceptRule {
+    const o = obj as Record<string, object>;
+    const actionStr: string = typeof o.action === "string" ? o.action : "ALLOW";
+    return new WebInterceptRule(
+      typeof o.ruleId === "string" ? o.ruleId : "",
+      typeof o.pattern === "string" ? o.pattern : "",
+      actionStr as WebInterceptAction,
+      typeof o.needTokenInject === "boolean" ? o.needTokenInject as boolean : false
+    );
   }
 
   // ============================================================

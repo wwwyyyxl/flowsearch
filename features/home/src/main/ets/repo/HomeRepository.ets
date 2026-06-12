@@ -1,35 +1,30 @@
 /**
  * @file HomeRepository.ets
- * @description 首页数据源。从 HomeMock 取数据 + 模拟网络延时和错误。
+ * @description 首页数据源。S21 升级:真实 API 优先,MockData 降级为 fallback。
  *
  * 设计要点(同源底线 / 简历主线 5):
  *
  * 1. 零装饰器(plain class):
- *    本类不引入任何 @ObservedV2 / @Trace / @ComponentV2 等 ArkUI 装饰器,
- *    全部走 async / Promise / setTimeout,可以整段平移到 Kotlin:
+ *    可以整段平移到 Kotlin:
  *      class HomeRepository {
  *        suspend fun fetchFeed(channelId: String, mode: SimulationMode): HomeFeedData
  *      }
- *    -> 这是简历"双端数据层 1:1 平移"的根证据。
  *
- * 2. 不持有状态:
- *    所有方法都是纯函数(给定输入 -> 给定输出 / 异常),
- *    缓存策略放在 VM 或更上层,Repository 只管"怎么取"。
+ * 2. S21 Fallback 策略:
+ *    ① SimulationMode error/empty → 短路走 Mock(保留调试面板行为)
+ *    ② HttpClient.baseUrl 非空 → 尝试真实 API → catch 降级到 ③
+ *    ③ Mock fallback(sleep + MockData 调用)
  *
- * 3. 接口契约用 throw + 自定义错误对象:
- *    ArkTS 没有 Kotlin 的 Result<T>,但 commons/base 里已有 Result 类,
- *    本期为了让 VM 用 try/catch 风格(与 Kotlin runCatching 心智一致),
- *    Repository 直接 throw 错误,VM 用 try/catch 包装。
+ * 3. 方法签名不变 — ViewModel 层零改动。
  *
- * 4. 函数签名:
- *    fetchFeed(channelId, mode) -> Promise<HomeFeedData>
- *    -- 不用 PRD §07 §2.1 那种聚合响应包,因为响应包封装该在 commons/network 做,
- *    本期没建 network 模块,Repository 直接返回 data 部分,VM 直接消费。
- *    S2 接 commons/network 后,Repository 升级为调 MockApiClient,签名不变。
+ * 4. 响应映射用 Record<string, object> cast + typeof 守卫:
+ *    与 FavoriteRecord.fromJson 同模式。
  */
 
-import { HomeFeedData, Article } from "@flowsearch/base";
+import { HomeFeedData, Article, ArticleInit, Channel, ToolEntry, CategoryTag } from "@flowsearch/base";
+import { HttpClient, HttpError, ApiResponse } from "@flowsearch/base";
 import { HomeMock } from "@flowsearch/mockdata";
+import { hilog } from "@kit.PerformanceAnalysisKit";
 import { SimulationMode } from "./SimulationMode";
 
 /** Mock 分页:每页条数。 */
@@ -39,6 +34,9 @@ const PAGE_SIZE: number = 3;
 const DELAY_NORMAL_MS: number = 200;
 const DELAY_ERROR_MS: number = 500;
 const DELAY_SLOW_MS: number = 3000;
+
+const TAG: string = "HomeRepo";
+const DOMAIN: number = 0x0000;
 
 /** Repository 抛出的错误对象,带 errorCode 字段,便于 VM 翻译成 PageState.error。 */
 export class HomeRepoError extends Error {
@@ -64,22 +62,15 @@ export class FetchMoreResult {
 export class HomeRepository {
   /**
    * 拉取指定频道的首页数据。
-   *
-   * @param channelId 频道 id(如 "hot" / "tech")
-   * @param mode      模拟模式(本期默认 normal,调试浮层可切换)
-   * @returns         HomeFeedData(频道 + 工具入口 + 文章列表)
-   * @throws          HomeRepoError(mode === "error" 时,500 服务异常)
+   * S21:真实 API 优先 → Mock fallback。
    */
   async fetchFeed(channelId: string, mode: SimulationMode): Promise<HomeFeedData> {
-    const delayMs: number = HomeRepository.pickDelay(mode);
-    await HomeRepository.sleep(delayMs);
-
+    // ① SimulationMode 短路(保留调试面板行为)
     if (mode === "error") {
       throw new HomeRepoError("500", "服务器开小差了,请稍后重试");
     }
 
     if (mode === "empty") {
-      // 频道列表和工具入口仍然要给(顶部 UI 需要渲染),但文章列表强制空
       return new HomeFeedData(
         HomeMock.getChannels(),
         HomeMock.getQuickEntries(),
@@ -87,30 +78,67 @@ export class HomeRepository {
       );
     }
 
-    // normal / slow 都走正常数据(slow 只是延时长一点)
+    // ② 真实 API 尝试
+    if (HttpClient.baseUrl.length > 0) {
+      try {
+        const params: Map<string, string> = new Map();
+        params.set("channelId", channelId);
+        const resp: ApiResponse = await HttpClient.get("/api/tool/home", params);
+        if (resp.data !== null) {
+          const feed: HomeFeedData = HomeRepository.mapHomeFeed(resp.data);
+          hilog.info(DOMAIN, TAG, "fetchFeed API ok, articles=%{public}d", feed.articles.length);
+          return feed;
+        }
+      } catch (err) {
+        hilog.warn(DOMAIN, TAG, "fetchFeed API fallback: %{public}s", JSON.stringify(err));
+      }
+    }
+
+    // ③ Mock fallback
+    const delayMs: number = HomeRepository.pickDelay(mode);
+    await HomeRepository.sleep(delayMs);
     return HomeMock.getHomeFeed(channelId);
   }
 
   /**
    * Mock 分页:取指定频道的第 page 页文章(0-based)。
-   * 模拟网络延时后按 PAGE_SIZE 分片返回。
-   *
-   * @param channelId 频道 id
-   * @param page      页码(0-based)
-   * @param mode      模拟模式
-   * @returns         { articles: 本页文章, hasMore: 是否还有下一页 }
+   * S21:真实 API 优先 → Mock fallback。
    */
   async fetchMore(
     channelId: string,
     page: number,
     mode: SimulationMode
   ): Promise<FetchMoreResult> {
-    const delayMs: number = HomeRepository.pickDelay(mode);
-    await HomeRepository.sleep(delayMs);
-
     if (mode === "error") {
       throw new HomeRepoError("500", "加载更多失败");
     }
+
+    // ② 真实 API 尝试
+    if (HttpClient.baseUrl.length > 0) {
+      try {
+        const params: Map<string, string> = new Map();
+        params.set("channelId", channelId);
+        params.set("page", String(page));
+        const resp: ApiResponse = await HttpClient.get("/api/tool/feed", params);
+        if (resp.data !== null) {
+          const d = resp.data as Record<string, object>;
+          const rawList = d.list as Array<object>;
+          const articles: Array<Article> = new Array();
+          for (let i: number = 0; i < rawList.length; i++) {
+            articles.push(HomeRepository.mapArticle(rawList[i]));
+          }
+          const hasMore: boolean = typeof d.hasMore === "boolean" ? d.hasMore as boolean : false;
+          hilog.info(DOMAIN, TAG, "fetchMore API ok, count=%{public}d", articles.length);
+          return new FetchMoreResult(articles, hasMore);
+        }
+      } catch (err) {
+        hilog.warn(DOMAIN, TAG, "fetchMore API fallback: %{public}s", JSON.stringify(err));
+      }
+    }
+
+    // ③ Mock fallback
+    const delayMs: number = HomeRepository.pickDelay(mode);
+    await HomeRepository.sleep(delayMs);
 
     const all: Array<Article> = HomeMock.getArticles(channelId);
     const start: number = page * PAGE_SIZE;
@@ -120,6 +148,87 @@ export class HomeRepository {
 
     return new FetchMoreResult(articles, hasMore);
   }
+
+  // ============================================================
+  // 内部:API 响应映射
+  // ============================================================
+
+  /**
+   * 映射 /api/tool/home 响应 data → HomeFeedData。
+   * 期望 data 结构: { channels: [...], quickEntries: [...], firstFeed: { list: [...] } }
+   */
+  private static mapHomeFeed(data: object): HomeFeedData {
+    const d = data as Record<string, object>;
+
+    const channels: Array<Channel> = new Array();
+    const rawChannels = d.channels as Array<object>;
+    for (let i: number = 0; i < rawChannels.length; i++) {
+      channels.push(HomeRepository.mapChannel(rawChannels[i]));
+    }
+
+    const entries: Array<ToolEntry> = new Array();
+    const rawEntries = d.quickEntries as Array<object>;
+    for (let i: number = 0; i < rawEntries.length; i++) {
+      entries.push(HomeRepository.mapToolEntry(rawEntries[i]));
+    }
+
+    const articles: Array<Article> = new Array();
+    const firstFeed = d.firstFeed as Record<string, object>;
+    if (firstFeed !== null && firstFeed !== undefined) {
+      const rawList = firstFeed.list as Array<object>;
+      for (let i: number = 0; i < rawList.length; i++) {
+        articles.push(HomeRepository.mapArticle(rawList[i]));
+      }
+    }
+
+    return new HomeFeedData(channels, entries, articles);
+  }
+
+  private static mapChannel(obj: object): Channel {
+    const o = obj as Record<string, object>;
+    return new Channel(
+      typeof o.channelId === "string" ? o.channelId : "",
+      typeof o.name === "string" ? o.name : "",
+      typeof o.order === "number" ? o.order as number : 0,
+      typeof o.fixed === "boolean" ? o.fixed as boolean : true
+    );
+  }
+
+  private static mapToolEntry(obj: object): ToolEntry {
+    const o = obj as Record<string, object>;
+    return new ToolEntry(
+      typeof o.toolId === "string" ? o.toolId : "",
+      typeof o.name === "string" ? o.name : "",
+      typeof o.iconKey === "string" ? o.iconKey : "",
+      typeof o.targetType === "string" ? o.targetType as "SHELL" | "WEB" : "SHELL",
+      typeof o.targetUrl === "string" ? o.targetUrl : null,
+      typeof o.order === "number" ? o.order as number : 0
+    );
+  }
+
+  private static mapArticle(obj: object): Article {
+    const o = obj as Record<string, object>;
+    const tag: string = typeof o.categoryTag === "string" ? o.categoryTag : "WEB";
+    const init: ArticleInit = {
+      articleId: typeof o.articleId === "string" ? o.articleId : "",
+      title: typeof o.title === "string" ? o.title : "",
+      summary: typeof o.summary === "string" ? o.summary : "",
+      coverUrl: typeof o.coverUrl === "string" ? o.coverUrl : null,
+      coverPlaceholder: typeof o.coverPlaceholder === "string" ? o.coverPlaceholder : "",
+      categoryTag: tag as CategoryTag,
+      source: typeof o.source === "string" ? o.source : "",
+      publishTime: typeof o.publishTime === "string" ? o.publishTime : "",
+      publishTimeDisplay: typeof o.publishTimeDisplay === "string" ? o.publishTimeDisplay : "",
+      targetUrl: typeof o.targetUrl === "string" ? o.targetUrl : "",
+      favorite: typeof o.favorite === "boolean" ? o.favorite as boolean : false,
+      channelId: typeof o.channelId === "string" ? o.channelId : ""
+    };
+    return new Article(init);
+  }
+
+  // ============================================================
+  // 内部:Mock 辅助
+  // ============================================================
 
   /** 按模式映射延时。集中一处,方便调参。 */
   private static pickDelay(mode: SimulationMode): number {

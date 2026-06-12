@@ -15,7 +15,7 @@
  *    update() 立即写入单个 key。
  */
 
-import { PreferencesHelper } from "@flowsearch/base";
+import { PreferencesHelper, HttpClient } from "@flowsearch/base";
 
 const STORE_NAME: string = "fsearch_settings";
 
@@ -27,6 +27,7 @@ const KEY_TRACKING: string = "app_tracking";
 const KEY_HTTPS_ONLY: string = "https_only_token";
 const KEY_JS: string = "js_enabled";
 const KEY_BROWSER: string = "default_browser";
+const KEY_API_BASE_URL: string = "api_base_url";
 
 /** @ObservedV2 设置数据模型,UI 可直接绑定 @Trace 字段。 */
 @ObservedV2
@@ -39,6 +40,7 @@ export class SettingsData {
   @Trace httpsOnlyToken: boolean = true;
   @Trace jsEnabled: boolean = true;
   @Trace defaultBrowser: string = "system";
+  @Trace apiBaseUrl: string = "";
 }
 
 export class SettingsRepository {
@@ -96,6 +98,16 @@ export class SettingsRepository {
       data.defaultBrowser = browserVal;
     }
 
+    const apiVal: string | null = await PreferencesHelper.getJson(ctx, STORE_NAME, KEY_API_BASE_URL);
+    if (apiVal !== null) {
+      data.apiBaseUrl = apiVal;
+    }
+
+    // 同步到 HttpClient(非空时才设置)
+    if (data.apiBaseUrl.length > 0) {
+      HttpClient.baseUrl = data.apiBaseUrl;
+    }
+
     return data;
   }
 
@@ -116,4 +128,5 @@ export class SettingsRepository {
   static readonly KEY_HTTPS_ONLY: string = KEY_HTTPS_ONLY;
   static readonly KEY_JS: string = KEY_JS;
   static readonly KEY_BROWSER: string = KEY_BROWSER;
+  static readonly KEY_API_BASE_URL: string = KEY_API_BASE_URL;
 }

@@ -1,36 +1,28 @@
 /**
  * @file SearchRepository.ets
- * @description 搜索数据源:从 SearchMock 取数据 + 模拟网络延时和错误。
+ * @description 搜索数据源:S21 升级:真实 API 优先,MockData 降级为 fallback。
  *
  * 设计要点(对齐 HomeRepository 同源底线):
  *
- * 1. 零装饰器(plain class):
- *    可以整段平移到 Kotlin:
- *      class SearchRepository {
- *        suspend fun fetchSuggestions(keyword: String): List<SearchSuggestion>
- *        suspend fun fetchResults(keyword: String, sort: SortType): List<Article>
- *        suspend fun fetchAiAnswer(keyword: String): AiQuickAnswer?
- *      }
+ * 1. 零装饰器(plain class),可整段平移 Kotlin。
  *
- * 2. 接口数对应 PRD §07-Mock-API:
- *    - fetchSuggestions  -> §2.5  GET /api/search/suggest
- *    - fetchResults      -> §2.6  GET /api/search/result
- *    - fetchAiAnswer     -> §2.7  GET /api/search/ai-quick-answer
+ * 2. S21 Fallback 策略:
+ *    ① SimulationMode error/empty → 短路走 Mock
+ *    ② HttpClient.baseUrl 非空 → 尝试真实 API → catch 降级到 ③
+ *    ③ Mock fallback(sleep + MockData 调用)
  *
- * 3. AI 速答有独立 2s 超时(PRD §04-03 §6),
- *    本期用 Promise.race 模拟,真实接口在 commons/network 拦截器里做。
+ * 3. AI 速答保留 Promise.race 2s 超时(PRD §04-03 §6)。
  *
- * 4. 错误码:
- *    - "500"        网络/服务异常
- *    - "TIMEOUT"    AI 速答 2s 超时(仅静默,不抛给 VM)
- *
- * 5. 历史 / 热搜不走 Repository:
- *    历史本期是 SearchMock 内存常量,S4 接 Preferences 后另起一个 HistoryRepository。
- *    热搜直接由 VM 通过 SearchMock 同步取(简单,不走 Promise),省一层异步。
+ * 4. getSearchInput() 保持 Mock-only(同步方法,不走 HTTP)。
  */
 
-import { Article, SearchSuggestion, AiQuickAnswer, SortType, SearchInputData } from "@flowsearch/base";
+import {
+  Article, ArticleInit, CategoryTag, SearchSuggestion, AiQuickAnswer,
+  SortType, SearchInputData, SuggestionType
+} from "@flowsearch/base";
+import { HttpClient, HttpError, ApiResponse } from "@flowsearch/base";
 import { SearchMock } from "@flowsearch/mockdata";
+import { hilog } from "@kit.PerformanceAnalysisKit";
 import { SimulationMode } from "./SimulationMode";
 
 const DELAY_NORMAL_MS: number = 200;
@@ -42,6 +34,9 @@ const SEARCH_PAGE_SIZE: number = 3;
 
 /** AI 速答超时阈值(PRD §04-03 §6:"接口请求超时 2s")。 */
 const AI_ANSWER_TIMEOUT_MS: number = 2000;
+
+const TAG: string = "SearchRepo";
+const DOMAIN: number = 0x0000;
 
 /** Repository 抛出的错误对象(沿用 HomeRepoError 风格,但本模块独立)。 */
 export class SearchRepoError extends Error {
@@ -66,7 +61,7 @@ export class SearchFetchMoreResult {
 
 export class SearchRepository {
   /**
-   * 取空输入态(历史 + 热搜)。本期同步返回,不模拟延时 -- 历史是本地数据。
+   * 取空输入态(历史 + 热搜)。同步返回,不走 HTTP。
    */
   getSearchInput(): SearchInputData {
     return SearchMock.getSearchInput();
@@ -74,14 +69,10 @@ export class SearchRepository {
 
   /**
    * 拉取建议词(对应 GET /api/search/suggest)。
-   * keyword 已经被 VM debounce 过,这里不再额外节流。
+   * S21:真实 API 优先 → Mock fallback。
    */
   async fetchSuggestions(keyword: string, mode: SimulationMode): Promise<Array<SearchSuggestion>> {
-    await SearchRepository.sleep(SearchRepository.pickDelay(mode));
-
     if (mode === "error") {
-      // PRD §04-02 §6:Error(建议接口) 静默失败 -- VM 层 catch 后不抛 PageState.error,
-      // 直接 fallback 空列表。但 Repository 接口语义保留 throw,VM 自己决定。
       throw new SearchRepoError("500", "建议接口异常");
     }
 
@@ -89,16 +80,37 @@ export class SearchRepository {
       return new Array();
     }
 
+    // 真实 API 尝试
+    if (HttpClient.baseUrl.length > 0) {
+      try {
+        const params: Map<string, string> = new Map();
+        params.set("keyword", keyword);
+        const resp: ApiResponse = await HttpClient.get("/api/search/suggest", params);
+        if (resp.data !== null) {
+          const d = resp.data as Record<string, object>;
+          const rawList = d.list as Array<object>;
+          const result: Array<SearchSuggestion> = new Array();
+          for (let i: number = 0; i < rawList.length; i++) {
+            result.push(SearchRepository.mapSuggestion(rawList[i]));
+          }
+          hilog.info(DOMAIN, TAG, "fetchSuggestions API ok, count=%{public}d", result.length);
+          return result;
+        }
+      } catch (err) {
+        hilog.warn(DOMAIN, TAG, "fetchSuggestions API fallback: %{public}s", JSON.stringify(err));
+      }
+    }
+
+    // Mock fallback
+    await SearchRepository.sleep(SearchRepository.pickDelay(mode));
     return SearchMock.getSuggestions(keyword);
   }
 
   /**
    * 拉取搜索结果(对应 GET /api/search/result)。
-   * sort 切换时 VM 重调此方法,但 AI 速答卡保留(PRD §04-03 §3)。
+   * S21:真实 API 优先 → Mock fallback。
    */
   async fetchResults(keyword: string, sort: SortType, mode: SimulationMode): Promise<Array<Article>> {
-    await SearchRepository.sleep(SearchRepository.pickDelay(mode));
-
     if (mode === "error") {
       throw new SearchRepoError("500", "服务器开小差了,请稍后重试");
     }
@@ -107,34 +119,79 @@ export class SearchRepository {
       return new Array();
     }
 
+    // 真实 API 尝试
+    if (HttpClient.baseUrl.length > 0) {
+      try {
+        const params: Map<string, string> = new Map();
+        params.set("keyword", keyword);
+        params.set("sort", sort);
+        const resp: ApiResponse = await HttpClient.get("/api/search/result", params);
+        if (resp.data !== null) {
+          const d = resp.data as Record<string, object>;
+          const rawList = d.list as Array<object>;
+          const result: Array<Article> = new Array();
+          for (let i: number = 0; i < rawList.length; i++) {
+            result.push(SearchRepository.mapArticle(rawList[i]));
+          }
+          hilog.info(DOMAIN, TAG, "fetchResults API ok, count=%{public}d", result.length);
+          return result;
+        }
+      } catch (err) {
+        hilog.warn(DOMAIN, TAG, "fetchResults API fallback: %{public}s", JSON.stringify(err));
+      }
+    }
+
+    // Mock fallback
+    await SearchRepository.sleep(SearchRepository.pickDelay(mode));
     return SearchMock.getResults(keyword, sort);
   }
 
   /**
    * 拉取 AI 速答(对应 GET /api/search/ai-quick-answer)。
-   * 与 fetchResults 并行调用。本方法**永不抛**,失败/超时/null 都返回 null,
-   * 让 UI 层简单一致:`aiAnswer === null` 就隐藏整张卡。
+   * 永不抛错,失败/超时/null 都返回 null。
+   * S21:保留 Promise.race 2s 超时结构。
    */
   async fetchAiAnswer(keyword: string, mode: SimulationMode): Promise<AiQuickAnswer | null> {
-    // 超时与延时竞速,先到先返回
-    const delay: number = SearchRepository.pickDelay(mode);
-
-    const dataPromise: Promise<AiQuickAnswer | null> = SearchRepository.sleep(delay).then((): AiQuickAnswer | null => {
+    // 真实 API 调用(包装在 dataPromise 中,与 2s 超时竞速)
+    const dataPromise: Promise<AiQuickAnswer | null> = (async (): Promise<AiQuickAnswer | null> => {
       if (mode === "error" || mode === "empty") {
         return null;
       }
-      return SearchMock.getAiAnswer(keyword);
-    });
 
-    // PRD §04-03 §6:2s 超时静默隐藏。slow 模式 3000ms > 2000ms 必然命中超时。
-    const timeoutPromise: Promise<AiQuickAnswer | null> = SearchRepository.sleep(AI_ANSWER_TIMEOUT_MS).then((): AiQuickAnswer | null => null);
+      // 真实 API 尝试
+      if (HttpClient.baseUrl.length > 0) {
+        try {
+          const params: Map<string, string> = new Map();
+          params.set("keyword", keyword);
+          const resp: ApiResponse = await HttpClient.get("/api/search/ai-quick-answer", params);
+          if (resp.data !== null) {
+            const answer: AiQuickAnswer = SearchRepository.mapAiAnswer(resp.data);
+            hilog.info(DOMAIN, TAG, "fetchAiAnswer API ok");
+            return answer;
+          }
+          return null;
+        } catch (err) {
+          hilog.warn(DOMAIN, TAG, "fetchAiAnswer API fallback: %{public}s", JSON.stringify(err));
+        }
+      }
+
+      // Mock fallback
+      const delay: number = SearchRepository.pickDelay(mode);
+      await SearchRepository.sleep(delay);
+      return SearchMock.getAiAnswer(keyword);
+    })();
+
+    // PRD §04-03 §6: 2s 超时静默隐藏。slow 模式 3000ms > 2000ms 必然命中超时。
+    const timeoutPromise: Promise<AiQuickAnswer | null> = SearchRepository.sleep(AI_ANSWER_TIMEOUT_MS).then(
+      (): AiQuickAnswer | null => null
+    );
 
     return Promise.race([dataPromise, timeoutPromise]);
   }
 
   /**
    * S17:Mock 分页:取搜索结果的第 page 页(0-based)。
-   * Mock 数据量小,用 cycle + suffix 模拟更多数据,最多返回 3 页。
+   * S21:真实 API 优先 → Mock fallback。
    */
   async fetchMore(
     keyword: string,
@@ -142,12 +199,37 @@ export class SearchRepository {
     page: number,
     mode: SimulationMode
   ): Promise<SearchFetchMoreResult> {
-    const delayMs: number = SearchRepository.pickDelay(mode);
-    await SearchRepository.sleep(delayMs);
-
     if (mode === "error") {
       throw new SearchRepoError("500", "加载更多失败");
     }
+
+    // 真实 API 尝试
+    if (HttpClient.baseUrl.length > 0) {
+      try {
+        const params: Map<string, string> = new Map();
+        params.set("keyword", keyword);
+        params.set("sort", sort);
+        params.set("page", String(page));
+        const resp: ApiResponse = await HttpClient.get("/api/search/result", params);
+        if (resp.data !== null) {
+          const d = resp.data as Record<string, object>;
+          const rawList = d.list as Array<object>;
+          const articles: Array<Article> = new Array();
+          for (let i: number = 0; i < rawList.length; i++) {
+            articles.push(SearchRepository.mapArticle(rawList[i]));
+          }
+          const hasMore: boolean = typeof d.hasMore === "boolean" ? d.hasMore as boolean : false;
+          hilog.info(DOMAIN, TAG, "fetchMore API ok, count=%{public}d", articles.length);
+          return new SearchFetchMoreResult(articles, hasMore);
+        }
+      } catch (err) {
+        hilog.warn(DOMAIN, TAG, "fetchMore API fallback: %{public}s", JSON.stringify(err));
+      }
+    }
+
+    // Mock fallback
+    const delayMs: number = SearchRepository.pickDelay(mode);
+    await SearchRepository.sleep(delayMs);
 
     // Mock:最多 3 页
     const maxPages: number = 3;
@@ -159,7 +241,7 @@ export class SearchRepository {
     const base: Array<Article> = SearchMock.getResults(keyword, sort);
     const start: number = page * SEARCH_PAGE_SIZE;
     const articles: Array<Article> = new Array();
-    for (let i = 0; i < SEARCH_PAGE_SIZE; i++) {
+    for (let i: number = 0; i < SEARCH_PAGE_SIZE; i++) {
       const src: Article = base[(start + i) % base.length];
       articles.push(new Article({
         articleId: src.articleId + "_p" + page + "_" + i,
@@ -179,6 +261,62 @@ export class SearchRepository {
     const hasMore: boolean = (page + 1) < maxPages;
     return new SearchFetchMoreResult(articles, hasMore);
   }
+
+  // ============================================================
+  // 内部:API 响应映射
+  // ============================================================
+
+  private static mapSuggestion(obj: object): SearchSuggestion {
+    const o = obj as Record<string, object>;
+    const typeStr: string = typeof o.type === "string" ? o.type : "NORMAL";
+    return new SearchSuggestion(
+      typeof o.suggestionId === "string" ? o.suggestionId : "",
+      typeof o.keyword === "string" ? o.keyword : "",
+      typeStr as SuggestionType,
+      typeof o.hot === "boolean" ? o.hot as boolean : false
+    );
+  }
+
+  private static mapAiAnswer(obj: object): AiQuickAnswer {
+    const o = obj as Record<string, object>;
+    const related: Array<string> = new Array();
+    if (typeof o.relatedQuestions === "object" && o.relatedQuestions !== null) {
+      const rawArr = o.relatedQuestions as Array<object>;
+      for (let i: number = 0; i < rawArr.length; i++) {
+        related.push(String(rawArr[i]));
+      }
+    }
+    return new AiQuickAnswer(
+      typeof o.answerId === "string" ? o.answerId : "",
+      typeof o.summary === "string" ? o.summary : "",
+      related,
+      typeof o.disclaimer === "string" ? o.disclaimer : ""
+    );
+  }
+
+  private static mapArticle(obj: object): Article {
+    const o = obj as Record<string, object>;
+    const tag: string = typeof o.categoryTag === "string" ? o.categoryTag : "WEB";
+    const init: ArticleInit = {
+      articleId: typeof o.articleId === "string" ? o.articleId : "",
+      title: typeof o.title === "string" ? o.title : "",
+      summary: typeof o.summary === "string" ? o.summary : "",
+      coverUrl: typeof o.coverUrl === "string" ? o.coverUrl : null,
+      coverPlaceholder: typeof o.coverPlaceholder === "string" ? o.coverPlaceholder : "",
+      categoryTag: tag as CategoryTag,
+      source: typeof o.source === "string" ? o.source : "",
+      publishTime: typeof o.publishTime === "string" ? o.publishTime : "",
+      publishTimeDisplay: typeof o.publishTimeDisplay === "string" ? o.publishTimeDisplay : "",
+      targetUrl: typeof o.targetUrl === "string" ? o.targetUrl : "",
+      favorite: typeof o.favorite === "boolean" ? o.favorite as boolean : false,
+      channelId: typeof o.channelId === "string" ? o.channelId : ""
+    };
+    return new Article(init);
+  }
+
+  // ============================================================
+  // 内部:Mock 辅助
+  // ============================================================
 
   private static pickDelay(mode: SimulationMode): number {
     if (mode === "slow") {
