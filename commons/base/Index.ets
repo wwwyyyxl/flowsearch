@@ -40,5 +40,8 @@ export { FavoriteRecord } from "./src/main/ets/types/FavoriteRecord";
 // ===== Utils 域(S12 新增) =====
 export { UrlDebounceGuard } from "./src/main/ets/utils/UrlDebounceGuard";
 
+// ===== Network 域(S18 新增) =====
+export { NetworkMonitor } from "./src/main/ets/utils/NetworkMonitor";
+
 // ===== Reading History 域(S13 新增) =====
 export { ReadingHistoryEntry } from "./src/main/ets/types/ReadingHistoryEntry";

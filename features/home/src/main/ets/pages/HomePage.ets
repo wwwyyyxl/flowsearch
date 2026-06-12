@@ -22,7 +22,7 @@
  */
 
 import promptAction from "@ohos.promptAction";
-import { PageState, Article, HomeFeedData, UrlDebounceGuard } from "@flowsearch/base";
+import { PageState, Article, HomeFeedData, UrlDebounceGuard, NetworkMonitor } from "@flowsearch/base";
 import { StateHost } from "@flowsearch/ui";
 import { RouteTable, WebContainerArgs, ToolShellArgs } from "@flowsearch/router";
 import { HomeViewModel } from "../viewmodel/HomeViewModel";
@@ -59,8 +59,25 @@ export struct HomePage {
   /** S17:下拉刷新状态。Refresh 组件通过 $$ 双向绑定。 */
   @Local isRefreshing: boolean = false;
 
+  /** S18:网络状态监听器单例引用。@Local 让 @Monitor 可追踪。 */
+  @Local networkMonitor: NetworkMonitor = NetworkMonitor.getInstance();
+
   aboutToAppear(): void {
     this.vm.init(getContext(this));
+  }
+
+  /** S18:网络状态变化联动。 */
+  @Monitor('networkMonitor.isOnline')
+  onNetworkChange(): void {
+    if (!this.networkMonitor.isOnline) {
+      promptAction.showToast({ message: $r("app.string.fs_network_offline_hint") });
+    } else {
+      // 网络恢复:如果当前频道是 Error 态,自动重试
+      const state: PageState = this.vm.getCurrentState();
+      if (state.isError()) {
+        this.vm.retryCurrent();
+      }
+    }
   }
 
   build() {

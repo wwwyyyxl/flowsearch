@@ -20,6 +20,14 @@
           "abilities": ["FsearchAbility"],
           "when": "always"
         }
+      },
+      {
+        "name": "ohos.permission.GET_NETWORK_INFO",
+        "reason": "$string:network_permission_reason",
+        "usedScene": {
+          "abilities": ["FsearchAbility"],
+          "when": "always"
+        }
       }
     ],
     "abilities": [

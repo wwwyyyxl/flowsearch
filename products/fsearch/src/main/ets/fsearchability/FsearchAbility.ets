@@ -3,7 +3,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { RouteTable } from "@flowsearch/router";
 import { ThemeManager } from "@flowsearch/theme";
-import { PreferencesHelper } from "@flowsearch/base";
+import { PreferencesHelper, NetworkMonitor } from "@flowsearch/base";
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'FsearchAbility';
@@ -37,6 +37,9 @@ export default class FsearchAbility extends UIAbility {
       hilog.error(DOMAIN, TAG, 'Stack: %{public}s', err.stack !== undefined ? err.stack : 'No stack');
     });
 
+    // S18:启动网络状态监听
+    NetworkMonitor.getInstance().start(this.context);
+
     // S14:记录深链(loadContent 回调后派发)
     if (want.uri !== undefined && want.uri.length > 0) {
       this.pendingDeepLinkUri = want.uri;
@@ -57,6 +60,7 @@ export default class FsearchAbility extends UIAbility {
 
   onDestroy(): void {
     errorManager.off('globalErrorOccurred');
+    NetworkMonitor.getInstance().stop();
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onDestroy');
   }
 

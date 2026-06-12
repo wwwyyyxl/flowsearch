@@ -38,7 +38,7 @@
 
 import promptAction from "@ohos.promptAction";
 import { pasteboard } from "@kit.BasicServicesKit";
-import { PageState, Article, SearchResultData, SortType, UrlDebounceGuard } from "@flowsearch/base";
+import { PageState, Article, SearchResultData, SortType, UrlDebounceGuard, NetworkMonitor } from "@flowsearch/base";
 import { RouteTable, SearchResultArgs, WebContainerArgs } from "@flowsearch/router";
 import { SearchResultViewModel } from "../viewmodel/SearchResultViewModel";
 import { SearchTopBar } from "../components/SearchTopBar";
@@ -67,8 +67,24 @@ export struct SearchResultPage {
   /** S17:下拉刷新状态。Refresh 组件通过 $$ 双向绑定。 */
   @Local isRefreshing: boolean = false;
 
+  /** S18:网络状态监听器单例引用。 */
+  @Local networkMonitor: NetworkMonitor = NetworkMonitor.getInstance();
+
   aboutToAppear(): void {
     this.vm.init(this.keyword, getContext(this));
+  }
+
+  /** S18:网络状态变化联动。 */
+  @Monitor('networkMonitor.isOnline')
+  onNetworkChange(): void {
+    if (!this.networkMonitor.isOnline) {
+      promptAction.showToast({ message: $r("app.string.fs_network_offline_hint") });
+    } else {
+      // 网络恢复:如果当前是 Error 态,自动重试搜索
+      if (this.vm.state.isError()) {
+        this.vm.retryCurrent();
+      }
+    }
   }
 
   build() {

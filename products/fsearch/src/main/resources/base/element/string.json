@@ -15,6 +15,18 @@
     {
       "name": "internet_permission_reason",
       "value": "FlowSearch Web 容器加载网页内容"
+    },
+    {
+      "name": "network_permission_reason",
+      "value": "FlowSearch 监听网络状态变化"
+    },
+    {
+      "name": "fs_network_offline_hint",
+      "value": "网络已断开,请检查网络设置"
+    },
+    {
+      "name": "fs_network_restored_hint",
+      "value": "网络已恢复"
     }
   ]
 }
