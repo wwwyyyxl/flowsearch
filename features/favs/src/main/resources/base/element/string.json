@@ -3,6 +3,98 @@
     {
       "name": "module_desc",
       "value": "FlowSearch favorites and history feature module"
+    },
+    {
+      "name": "fs_favs_page_title",
+      "value": "收藏与历史"
+    },
+    {
+      "name": "fs_favs_tab_favorites",
+      "value": "收藏"
+    },
+    {
+      "name": "fs_favs_tab_history",
+      "value": "历史"
+    },
+    {
+      "name": "fs_favs_manage",
+      "value": "管理"
+    },
+    {
+      "name": "fs_favs_done",
+      "value": "完成"
+    },
+    {
+      "name": "fs_favs_select_all",
+      "value": "全选"
+    },
+    {
+      "name": "fs_favs_unfavorite",
+      "value": "取消收藏"
+    },
+    {
+      "name": "fs_favs_group_today",
+      "value": "今天"
+    },
+    {
+      "name": "fs_favs_group_yesterday",
+      "value": "昨天"
+    },
+    {
+      "name": "fs_favs_group_this_week",
+      "value": "本周更早"
+    },
+    {
+      "name": "fs_favs_group_earlier",
+      "value": "更早"
+    },
+    {
+      "name": "fs_favs_history_load_error",
+      "value": "加载历史失败"
+    },
+    {
+      "name": "fs_favs_no_favorites",
+      "value": "暂无收藏"
+    },
+    {
+      "name": "fs_favs_no_history",
+      "value": "暂无历史"
+    },
+    {
+      "name": "fs_favs_no_favorites_hint",
+      "value": "还没有收藏内容"
+    },
+    {
+      "name": "fs_favs_collect_hint",
+      "value": "浏览文章时点击收藏按钮即可"
+    },
+    {
+      "name": "fs_favs_fav_load_error",
+      "value": "加载收藏失败"
+    },
+    {
+      "name": "fs_favs_retry",
+      "value": "重试"
+    },
+    {
+      "name": "fs_favs_all_prefix",
+      "value": "全部"
+    },
+    {
+      "name": "fs_favs_no_history_hint",
+      "value": "还没有搜索历史"
+    },
+    {
+      "name": "fs_favs_history_record_hint",
+      "value": "搜索内容后会自动记录"
+    },
+    {
+      "name": "fs_favs_history_count_suffix",
+      "value": "条历史"
+    },
+    {
+      "name": "fs_favs_clear_all",
+      "value": "清除全部"
     }
   ]
 }

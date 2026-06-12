@@ -16,8 +16,8 @@ export struct FavsTabs {
 
   build() {
     Row() {
-      this.buildTab("favorites", "收藏")
-      this.buildTab("history", "历史")
+      this.buildTab("favorites", $r("app.string.fs_favs_tab_favorites"))
+      this.buildTab("history", $r("app.string.fs_favs_tab_history"))
     }
     .width("100%")
     .height(44)
@@ -26,7 +26,7 @@ export struct FavsTabs {
   }
 
   @Builder
-  buildTab(key: string, label: string) {
+  buildTab(key: string, label: ResourceStr) {
     Column() {
       Text(label)
         .fontSize($r("app.float.fs_text_body"))

@@ -209,12 +209,12 @@ export struct SearchResultPage {
         .maxLines(2)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-      Text("建议换个关键词")
+      Text($r("app.string.fs_search_try_other_keywords"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_secondary"))
         .margin({ top: $r("app.float.fs_space_sm") })
 
-      Button("返回首页")
+      Button($r("app.string.fs_search_back_home"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_primary"))
         .backgroundColor($r("app.color.fs_color_surface"))
@@ -251,18 +251,18 @@ export struct SearchResultPage {
       .width(80)
       .height(80)
 
-      Text("搜索失败")
+      Text($r("app.string.fs_search_error"))
         .fontSize($r("app.float.fs_text_title_2"))
         .fontWeight(FontWeight.Bold)
         .fontColor($r("app.color.fs_color_text_primary"))
         .margin({ top: $r("app.float.fs_space_lg") })
 
-      Text(`错误码: ${this.vm.state.errorCode}`)
+      Text($r("app.string.fs_search_error_code") + ": " + this.vm.state.errorCode)
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_tertiary"))
         .margin({ top: $r("app.float.fs_space_sm") })
 
-      Button("重试")
+      Button($r("app.string.fs_search_retry"))
         .fontSize($r("app.float.fs_text_body_lg"))
         .fontColor($r("app.color.fs_color_text_inverse"))
         .backgroundColor($r("app.color.fs_color_primary"))

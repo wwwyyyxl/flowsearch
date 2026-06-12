@@ -3,6 +3,262 @@
     {
       "name": "module_desc",
       "value": "FlowSearch settings feature module"
+    },
+    {
+      "name": "fs_settings_title",
+      "value": "设置"
+    },
+    {
+      "name": "fs_settings_group_general",
+      "value": "通用"
+    },
+    {
+      "name": "fs_settings_theme_mode",
+      "value": "主题模式"
+    },
+    {
+      "name": "fs_settings_language",
+      "value": "语言"
+    },
+    {
+      "name": "fs_settings_font_size",
+      "value": "字体大小"
+    },
+    {
+      "name": "fs_settings_lang_zh_cn",
+      "value": "简体中文"
+    },
+    {
+      "name": "fs_settings_group_privacy",
+      "value": "隐私与数据"
+    },
+    {
+      "name": "fs_settings_personalized_recommend",
+      "value": "个性化推荐"
+    },
+    {
+      "name": "fs_settings_app_tracking",
+      "value": "应用内追踪"
+    },
+    {
+      "name": "fs_settings_clear_cache",
+      "value": "清理缓存"
+    },
+    {
+      "name": "fs_settings_clear_history",
+      "value": "清理搜索历史"
+    },
+    {
+      "name": "fs_settings_clear_favorites",
+      "value": "清理收藏"
+    },
+    {
+      "name": "fs_settings_group_web",
+      "value": "Web 容器"
+    },
+    {
+      "name": "fs_settings_https_only",
+      "value": "仅在 HTTPS 注入登录态"
+    },
+    {
+      "name": "fs_settings_js_enabled",
+      "value": "启用 JavaScript"
+    },
+    {
+      "name": "fs_settings_default_browser",
+      "value": "默认浏览器"
+    },
+    {
+      "name": "fs_settings_browser_system",
+      "value": "系统默认"
+    },
+    {
+      "name": "fs_settings_browser_inapp",
+      "value": "应用内打开"
+    },
+    {
+      "name": "fs_settings_group_about",
+      "value": "关于"
+    },
+    {
+      "name": "fs_settings_version",
+      "value": "版本"
+    },
+    {
+      "name": "fs_settings_check_update",
+      "value": "检查更新"
+    },
+    {
+      "name": "fs_settings_user_agreement",
+      "value": "用户协议"
+    },
+    {
+      "name": "fs_settings_privacy_policy",
+      "value": "隐私政策"
+    },
+    {
+      "name": "fs_settings_feedback",
+      "value": "反馈"
+    },
+    {
+      "name": "fs_settings_email_copied",
+      "value": "邮箱已复制到剪贴板"
+    },
+    {
+      "name": "fs_dialog_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "fs_dialog_clear",
+      "value": "清理"
+    },
+    {
+      "name": "fs_dialog_clear_cache_title",
+      "value": "清理缓存"
+    },
+    {
+      "name": "fs_dialog_clear_history_title",
+      "value": "清理搜索历史"
+    },
+    {
+      "name": "fs_dialog_clear_favorites_title",
+      "value": "清理收藏"
+    },
+    {
+      "name": "fs_dialog_clear_cache_desc",
+      "value": "将清除应用缓存数据，此操作不可撤销。"
+    },
+    {
+      "name": "fs_dialog_clear_history_desc",
+      "value": "将清除全部搜索历史记录，此操作不可撤销。"
+    },
+    {
+      "name": "fs_dialog_clear_favorites_desc",
+      "value": "将清除全部收藏内容，此操作不可撤销。"
+    },
+    {
+      "name": "fs_dialog_select_theme",
+      "value": "选择主题"
+    },
+    {
+      "name": "fs_dialog_theme_light",
+      "value": "浅色"
+    },
+    {
+      "name": "fs_dialog_theme_dark",
+      "value": "深色"
+    },
+    {
+      "name": "fs_dialog_theme_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "fs_dialog_font_size_title",
+      "value": "字体大小"
+    },
+    {
+      "name": "fs_dialog_font_small",
+      "value": "小号"
+    },
+    {
+      "name": "fs_dialog_font_standard",
+      "value": "标准"
+    },
+    {
+      "name": "fs_dialog_font_large",
+      "value": "大号"
+    },
+    {
+      "name": "fs_dialog_select_language",
+      "value": "选择语言"
+    },
+    {
+      "name": "fs_dialog_browser_title",
+      "value": "默认浏览器"
+    },
+    {
+      "name": "fs_dialog_new_version",
+      "value": "发现新版本"
+    },
+    {
+      "name": "fs_dialog_update_description",
+      "value": "修复已知问题，提升使用体验"
+    },
+    {
+      "name": "fs_dialog_update_later",
+      "value": "稍后"
+    },
+    {
+      "name": "fs_dialog_update_now",
+      "value": "立即更新"
+    },
+    {
+      "name": "fs_policy_agreement_title",
+      "value": "用户协议"
+    },
+    {
+      "name": "fs_policy_agreement_header",
+      "value": "FlowSearch 用户服务协议"
+    },
+    {
+      "name": "fs_policy_agreement_s1",
+      "value": "一、服务条款的确认与接纳"
+    },
+    {
+      "name": "fs_policy_agreement_s2",
+      "value": "二、服务内容"
+    },
+    {
+      "name": "fs_policy_agreement_s3",
+      "value": "三、用户行为规范"
+    },
+    {
+      "name": "fs_policy_agreement_s4",
+      "value": "四、知识产权"
+    },
+    {
+      "name": "fs_policy_agreement_s5",
+      "value": "五、免责声明"
+    },
+    {
+      "name": "fs_policy_agreement_s6",
+      "value": "六、协议修改"
+    },
+    {
+      "name": "fs_policy_privacy_title",
+      "value": "隐私政策"
+    },
+    {
+      "name": "fs_policy_privacy_header",
+      "value": "FlowSearch 隐私政策"
+    },
+    {
+      "name": "fs_policy_privacy_s1",
+      "value": "一、信息收集"
+    },
+    {
+      "name": "fs_policy_privacy_s2",
+      "value": "二、信息使用"
+    },
+    {
+      "name": "fs_policy_privacy_s3",
+      "value": "三、信息存储与安全"
+    },
+    {
+      "name": "fs_policy_privacy_s4",
+      "value": "四、Cookie 与本地存储"
+    },
+    {
+      "name": "fs_policy_privacy_s5",
+      "value": "五、第三方服务"
+    },
+    {
+      "name": "fs_policy_privacy_s6",
+      "value": "六、用户权利"
+    },
+    {
+      "name": "fs_policy_privacy_s7",
+      "value": "七、隐私政策更新"
     }
   ]
 }

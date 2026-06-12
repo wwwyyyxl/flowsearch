@@ -32,7 +32,7 @@ export struct UpdateDialog {
             .width("100%")
 
           // 标题
-          Text("发现新版本")
+          Text($r("app.string.fs_dialog_new_version"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -47,7 +47,7 @@ export struct UpdateDialog {
             .width("100%")
 
           // 更新内容
-          Text("修复已知问题，提升使用体验")
+          Text($r("app.string.fs_dialog_update_description"))
             .fontSize($r("app.float.fs_text_caption"))
             .fontColor($r("app.color.fs_color_text_tertiary"))
             .textAlign(TextAlign.Center)
@@ -55,7 +55,7 @@ export struct UpdateDialog {
 
           // 按钮行
           Row({ space: 12 }) {
-            Text("稍后")
+            Text($r("app.string.fs_dialog_update_later"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_secondary"))
               .backgroundColor($r("app.color.fs_color_background"))
@@ -65,7 +65,7 @@ export struct UpdateDialog {
               .layoutWeight(1)
               .onClick((): void => { this.onCancelTap(); })
 
-            Button("立即更新")
+            Button($r("app.string.fs_dialog_update_now"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_inverse"))
               .backgroundColor($r("app.color.fs_color_primary"))

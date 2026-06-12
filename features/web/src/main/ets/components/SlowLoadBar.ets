@@ -19,12 +19,12 @@ export struct SlowLoadBar {
   build() {
     if (this.visible) {
       Row() {
-        Text("页面加载较慢,请检查网络")
+        Text($r("app.string.fs_web_slow_load_hint"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_warning"))
           .layoutWeight(1)
 
-        Text("停止")
+        Text($r("app.string.fs_web_stop"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_primary"))
           .fontWeight(FontWeight.Medium)

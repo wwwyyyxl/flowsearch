@@ -30,7 +30,7 @@ export struct HomeSearchBar {
         .margin({ left: $r("app.float.fs_space_md"), right: $r("app.float.fs_space_sm") })
 
       // placeholder 文案
-      Text("搜索网页、工具、历史记录")
+      Text($r("app.string.fs_home_search_placeholder"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_tertiary"))
         .layoutWeight(1)

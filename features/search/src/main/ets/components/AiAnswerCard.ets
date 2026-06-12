@@ -33,14 +33,14 @@ export struct AiAnswerCard {
           .fontWeight(FontWeight.Bold)
           .margin({ right: 6 })
 
-        Text("AI 速答")
+        Text($r("app.string.fs_search_ai_answer"))
           .fontSize($r("app.float.fs_text_body"))
           .fontWeight(FontWeight.Bold)
           .fontColor($r("app.color.fs_color_primary"))
           .layoutWeight(1)
 
         // "Mock" chip
-        Text("Mock")
+        Text($r("app.string.fs_search_ai_mock"))
           .fontSize(10)
           .fontColor($r("app.color.fs_color_primary"))
           .fontWeight(FontWeight.Medium)
@@ -83,7 +83,7 @@ export struct AiAnswerCard {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Text("复制")
+        Text($r("app.string.fs_search_copy"))
           .fontSize($r("app.float.fs_text_caption"))
           .fontColor($r("app.color.fs_color_primary"))
           .margin({ left: $r("app.float.fs_space_sm") })

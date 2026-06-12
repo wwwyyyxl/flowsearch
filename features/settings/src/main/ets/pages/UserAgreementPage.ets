@@ -18,7 +18,7 @@ export struct UserAgreementPage {
             .fontSize(20)
             .fontColor($r("app.color.fs_color_text_primary"))
             .onClick((): void => { this.navPathStack.pop(); })
-          Text("用户协议")
+          Text($r("app.string.fs_policy_agreement_title"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -33,7 +33,7 @@ export struct UserAgreementPage {
         // 内容
         Scroll() {
           Column() {
-            Text("FlowSearch 用户服务协议")
+            Text($r("app.string.fs_policy_agreement_header"))
               .fontSize($r("app.float.fs_text_title_2"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -44,7 +44,7 @@ export struct UserAgreementPage {
               .fontColor($r("app.color.fs_color_text_secondary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("一、服务条款的确认与接纳")
+            Text($r("app.string.fs_policy_agreement_s1"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -55,7 +55,7 @@ export struct UserAgreementPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("二、服务内容")
+            Text($r("app.string.fs_policy_agreement_s2"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -66,7 +66,7 @@ export struct UserAgreementPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("三、用户行为规范")
+            Text($r("app.string.fs_policy_agreement_s3"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -77,7 +77,7 @@ export struct UserAgreementPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("四、知识产权")
+            Text($r("app.string.fs_policy_agreement_s4"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -88,7 +88,7 @@ export struct UserAgreementPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("五、免责声明")
+            Text($r("app.string.fs_policy_agreement_s5"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -99,7 +99,7 @@ export struct UserAgreementPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("六、协议修改")
+            Text($r("app.string.fs_policy_agreement_s6"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))

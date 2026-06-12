@@ -47,14 +47,14 @@ export struct WebErrorPage {
         .margin({ top: $r("app.float.fs_space_lg") })
 
       // 副标题
-      Text("可能是网络异常或目标页面暂时不可用")
+      Text($r("app.string.fs_web_error_subtitle"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_secondary"))
         .textAlign(TextAlign.Center)
         .margin({ top: $r("app.float.fs_space_sm") })
 
       // 错误码
-      Text(`错误码: ${this.errorCode} · trace: ${this.traceTail}`)
+      Text($r("app.string.fs_web_error_code") + ": " + this.errorCode + " . trace: " + this.traceTail)
         .fontSize($r("app.float.fs_text_caption"))
         .fontColor($r("app.color.fs_color_text_tertiary"))
         .margin({ top: $r("app.float.fs_space_sm") })
@@ -62,7 +62,7 @@ export struct WebErrorPage {
       // 按钮组(次左主右)
       Row({ space: 12 }) {
         // 次按钮:返回上一页
-        Button("返回上一页")
+        Button($r("app.string.fs_web_back"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_text_primary"))
           .backgroundColor($r("app.color.fs_color_surface"))
@@ -73,7 +73,7 @@ export struct WebErrorPage {
           .onClick((): void => { this.onBackTap(); })
 
         // 主按钮:重新加载
-        Button("重新加载")
+        Button($r("app.string.fs_web_reload"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_text_inverse"))
           .backgroundColor($r("app.color.fs_color_primary"))

@@ -79,7 +79,7 @@ export struct StateHost {
   @Builder
   buildOfflineBar() {
     Row() {
-      Text("数据来自缓存,下拉刷新")
+      Text($r("app.string.fs_state_offline_hint"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_warning"))
         .margin({ left: $r("app.float.fs_space_lg") })
@@ -149,18 +149,18 @@ export struct StateHost {
           .fontWeight(FontWeight.Bold)
       }
 
-      Text("加载失败")
+      Text($r("app.string.fs_state_load_error"))
         .fontSize($r("app.float.fs_text_body_lg"))
         .fontWeight(FontWeight.Bold)
         .fontColor($r("app.color.fs_color_text_primary"))
         .margin({ top: $r("app.float.fs_space_lg") })
 
-      Text(`错误码: ${this.state.errorCode}`)
+      Text($r("app.string.fs_state_error_code") + ": " + this.state.errorCode)
         .fontSize($r("app.float.fs_text_caption"))
         .fontColor($r("app.color.fs_color_text_tertiary"))
         .margin({ top: $r("app.float.fs_space_sm") })
 
-      Button("重试")
+      Button($r("app.string.fs_state_retry"))
         .fontSize($r("app.float.fs_text_body_lg"))
         .fontColor($r("app.color.fs_color_text_inverse"))
         .backgroundColor($r("app.color.fs_color_primary"))

@@ -9,9 +9,9 @@
 @ComponentV2
 export struct ConfirmDialog {
   @Param visible: boolean = false;
-  @Param title: string = "";
-  @Param description: string = "";
-  @Param confirmLabel: string = "清理";
+  @Param title: ResourceStr = "";
+  @Param description: ResourceStr = "";
+  @Param confirmLabel: ResourceStr = "清理";
   @Param isDanger: boolean = true;
   @Event onCancelTap: () => void = (): void => {};
   @Event onConfirmTap: () => void = (): void => {};
@@ -42,7 +42,7 @@ export struct ConfirmDialog {
           // 按钮行
           Row({ space: 12 }) {
             // 取消按钮
-            Text("取消")
+            Text($r("app.string.fs_dialog_cancel"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_secondary"))
               .backgroundColor($r("app.color.fs_color_background"))

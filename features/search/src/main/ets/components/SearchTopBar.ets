@@ -137,7 +137,7 @@ export struct SearchTopBar {
 
       // 右侧"取消"
       if (this.showCancel) {
-        Text("取消")
+        Text($r("app.string.fs_search_cancel"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_primary"))
           .margin({ left: $r("app.float.fs_space_md") })

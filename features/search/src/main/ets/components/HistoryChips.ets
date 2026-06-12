@@ -26,7 +26,7 @@ export struct HistoryChips {
     Column() {
       // 标题行
       Row() {
-        Text("搜索历史")
+        Text($r("app.string.fs_search_history_title"))
           .fontSize($r("app.float.fs_text_body_lg"))
           .fontWeight(FontWeight.Bold)
           .fontColor($r("app.color.fs_color_text_primary"))

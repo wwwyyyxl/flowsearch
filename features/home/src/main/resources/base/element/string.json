@@ -3,6 +3,26 @@
     {
       "name": "module_desc",
       "value": "FlowSearch home feature module"
+    },
+    {
+      "name": "fs_home_loading",
+      "value": "加载中"
+    },
+    {
+      "name": "fs_home_no_more",
+      "value": "没有更多了"
+    },
+    {
+      "name": "fs_home_search_placeholder",
+      "value": "搜索网页、工具、历史记录"
+    },
+    {
+      "name": "fs_home_channel_empty_title",
+      "value": "这个频道暂无内容"
+    },
+    {
+      "name": "fs_home_channel_empty_subtitle",
+      "value": "试试其他频道"
     }
   ]
 }

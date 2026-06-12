@@ -40,7 +40,7 @@ export struct FavoritesHistoryPage {
             .fontSize(20)
             .fontColor($r("app.color.fs_color_text_primary"))
             .onClick((): void => { this.navPathStack.pop(); })
-          Text("收藏与历史")
+          Text($r("app.string.fs_favs_page_title"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -134,11 +134,11 @@ export struct FavoritesHistoryPage {
       Text("⭐")
         .fontSize(48)
         .margin({ bottom: $r("app.float.fs_space_lg") })
-      Text("还没有收藏内容")
+      Text($r("app.string.fs_favs_no_favorites_hint"))
         .fontSize($r("app.float.fs_text_title_2"))
         .fontWeight(FontWeight.Bold)
         .fontColor($r("app.color.fs_color_text_primary"))
-      Text("浏览文章时点击收藏按钮即可")
+      Text($r("app.string.fs_favs_collect_hint"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_secondary"))
         .margin({ top: $r("app.float.fs_space_sm") })
@@ -153,11 +153,11 @@ export struct FavoritesHistoryPage {
   @Builder
   buildFavError() {
     Column() {
-      Text("加载收藏失败")
+      Text($r("app.string.fs_favs_fav_load_error"))
         .fontSize($r("app.float.fs_text_title_2"))
         .fontWeight(FontWeight.Bold)
         .fontColor($r("app.color.fs_color_text_primary"))
-      Button("重试")
+      Button($r("app.string.fs_favs_retry"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_inverse"))
         .backgroundColor($r("app.color.fs_color_primary"))
@@ -182,7 +182,7 @@ export struct FavoritesHistoryPage {
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_text_secondary"))
           .layoutWeight(1)
-        Text(this.vm.isManaging ? "完成" : "管理")
+        Text(this.vm.isManaging ? $r("app.string.fs_favs_done") : $r("app.string.fs_favs_manage"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_primary"))
           .onClick((): void => {
@@ -235,7 +235,7 @@ export struct FavoritesHistoryPage {
                   FavsArticleCard({
                     article: article,
                     showRemoveButton: !this.vm.isManaging,
-                    removeLabel: "取消收藏",
+                    removeLabel: $r("app.string.fs_favs_unfavorite"),
                     onCardTap: (a: Article): void => {
                       if (this.vm.isManaging) {
                         this.vm.toggleSelect(a.articleId);
@@ -269,12 +269,12 @@ export struct FavoritesHistoryPage {
       // 管理模式底部操作栏
       if (this.vm.isManaging) {
         Row() {
-          Text("全选")
+          Text($r("app.string.fs_favs_select_all"))
             .fontSize($r("app.float.fs_text_body"))
             .fontColor($r("app.color.fs_color_primary"))
             .onClick((): void => { this.vm.selectAll(); })
           Blank()
-          Text(`取消收藏 (${this.vm.selectedIds.length})`)
+          Text($r("app.string.fs_favs_unfavorite") + " (" + this.vm.selectedIds.length + ")")
             .fontSize($r("app.float.fs_text_body"))
             .fontColor($r("app.color.fs_color_danger"))
             .onClick((): void => { this.vm.batchRemove(); })
@@ -314,11 +314,11 @@ export struct FavoritesHistoryPage {
       Text("🕐")
         .fontSize(48)
         .margin({ bottom: $r("app.float.fs_space_lg") })
-      Text("还没有搜索历史")
+      Text($r("app.string.fs_favs_no_history_hint"))
         .fontSize($r("app.float.fs_text_title_2"))
         .fontWeight(FontWeight.Bold)
         .fontColor($r("app.color.fs_color_text_primary"))
-      Text("搜索内容后会自动记录")
+      Text($r("app.string.fs_favs_history_record_hint"))
         .fontSize($r("app.float.fs_text_body"))
         .fontColor($r("app.color.fs_color_text_secondary"))
         .margin({ top: $r("app.float.fs_space_sm") })
@@ -339,7 +339,7 @@ export struct FavoritesHistoryPage {
           .fontSize($r("app.float.fs_text_caption"))
           .fontColor($r("app.color.fs_color_text_tertiary"))
           .layoutWeight(1)
-        Text("清除全部")
+        Text($r("app.string.fs_favs_clear_all"))
           .fontSize($r("app.float.fs_text_caption"))
           .fontColor($r("app.color.fs_color_danger"))
           .onClick((): void => { this.vm.clearAllHistory(); })

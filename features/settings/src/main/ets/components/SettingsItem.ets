@@ -13,9 +13,9 @@
 @ComponentV2
 export struct SettingsItem {
   @Param icon: string = "";
-  @Param title: string = "";
+  @Param title: ResourceStr = "";
   @Param itemType: string = "text"; // "text" | "switch" | "info" | "action"
-  @Param value: string = "";
+  @Param value: ResourceStr = "";
   @Param switchOn: boolean = false;
   @Param showDivider: boolean = true;
   @Event onTap: () => void = (): void => {};

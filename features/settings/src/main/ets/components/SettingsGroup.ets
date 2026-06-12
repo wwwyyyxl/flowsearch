@@ -13,7 +13,7 @@
 
 @ComponentV2
 export struct SettingsGroup {
-  @Param title: string = "";
+  @Param title: ResourceStr = "";
   @BuilderParam content: () => void = this.defaultContent;
 
   @Builder

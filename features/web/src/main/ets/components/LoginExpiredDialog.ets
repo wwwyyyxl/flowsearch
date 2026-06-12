@@ -36,20 +36,20 @@ export struct LoginExpiredDialog {
             .fontColor($r("app.color.fs_color_text_primary"))
             .alignSelf(ItemAlign.Start)
 
-          Text("请重新登录后继续访问该页面")
+          Text($r("app.string.fs_web_login_expired_desc"))
             .fontSize($r("app.float.fs_text_body"))
             .fontColor($r("app.color.fs_color_text_secondary"))
             .alignSelf(ItemAlign.Start)
             .margin({ top: $r("app.float.fs_space_md") })
 
           Row({ space: 16 }) {
-            Text("取消")
+            Text($r("app.string.fs_web_cancel"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_secondary"))
               .padding({ left: 12, right: 12, top: 10, bottom: 10 })
               .onClick((): void => { this.onCancelTap(); })
 
-            Button("重新登录")
+            Button($r("app.string.fs_web_relogin"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_inverse"))
               .backgroundColor($r("app.color.fs_color_primary"))

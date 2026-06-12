@@ -18,7 +18,7 @@ export struct PrivacyPolicyPage {
             .fontSize(20)
             .fontColor($r("app.color.fs_color_text_primary"))
             .onClick((): void => { this.navPathStack.pop(); })
-          Text("隐私政策")
+          Text($r("app.string.fs_policy_privacy_title"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -33,7 +33,7 @@ export struct PrivacyPolicyPage {
         // 内容
         Scroll() {
           Column() {
-            Text("FlowSearch 隐私政策")
+            Text($r("app.string.fs_policy_privacy_header"))
               .fontSize($r("app.float.fs_text_title_2"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -44,7 +44,7 @@ export struct PrivacyPolicyPage {
               .fontColor($r("app.color.fs_color_text_secondary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("一、信息收集")
+            Text($r("app.string.fs_policy_privacy_s1"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -55,7 +55,7 @@ export struct PrivacyPolicyPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("二、信息使用")
+            Text($r("app.string.fs_policy_privacy_s2"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -66,7 +66,7 @@ export struct PrivacyPolicyPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("三、信息存储与安全")
+            Text($r("app.string.fs_policy_privacy_s3"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -77,7 +77,7 @@ export struct PrivacyPolicyPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("四、Cookie 与本地存储")
+            Text($r("app.string.fs_policy_privacy_s4"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -88,7 +88,7 @@ export struct PrivacyPolicyPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("五、第三方服务")
+            Text($r("app.string.fs_policy_privacy_s5"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -99,7 +99,7 @@ export struct PrivacyPolicyPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("六、用户权利")
+            Text($r("app.string.fs_policy_privacy_s6"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -110,7 +110,7 @@ export struct PrivacyPolicyPage {
               .fontColor($r("app.color.fs_color_text_primary"))
               .margin({ bottom: $r("app.float.fs_space_lg") })
 
-            Text("七、隐私政策更新")
+            Text($r("app.string.fs_policy_privacy_s7"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))

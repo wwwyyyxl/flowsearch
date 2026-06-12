@@ -72,7 +72,7 @@ export struct SettingsPage {
               .fontSize(20)
               .fontColor($r("app.color.fs_color_text_primary"))
               .onClick((): void => { this.navPathStack.pop(); })
-            Text("设置")
+            Text($r("app.string.fs_settings_title"))
               .fontSize($r("app.float.fs_text_title_2"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -113,7 +113,7 @@ export struct SettingsPage {
           visible: this.vm.showClearDialog,
           title: this.getClearTitle(),
           description: this.getClearDescription(),
-          confirmLabel: "清理",
+          confirmLabel: $r("app.string.fs_dialog_clear"),
           isDanger: true,
           onCancelTap: (): void => { this.vm.cancelClear(); },
           onConfirmTap: (): void => { this.vm.confirmClear(); }
@@ -145,25 +145,25 @@ export struct SettingsPage {
   }
 
   /** 获取弹层标题(按 clearDialogTarget 分支)。 */
-  private getClearTitle(): string {
+  private getClearTitle(): Resource {
     if (this.vm.clearDialogTarget === "cache") {
-      return "清理缓存";
+      return $r("app.string.fs_dialog_clear_cache_title");
     }
     if (this.vm.clearDialogTarget === "history") {
-      return "清理搜索历史";
+      return $r("app.string.fs_dialog_clear_history_title");
     }
-    return "清理收藏";
+    return $r("app.string.fs_dialog_clear_favorites_title");
   }
 
   /** 获取弹层描述(按 clearDialogTarget 分支)。 */
-  private getClearDescription(): string {
+  private getClearDescription(): Resource {
     if (this.vm.clearDialogTarget === "cache") {
-      return "将清除应用缓存数据，此操作不可撤销。";
+      return $r("app.string.fs_dialog_clear_cache_desc");
     }
     if (this.vm.clearDialogTarget === "history") {
-      return "将清除全部搜索历史记录，此操作不可撤销。";
+      return $r("app.string.fs_dialog_clear_history_desc");
     }
-    return "将清除全部收藏内容，此操作不可撤销。";
+    return $r("app.string.fs_dialog_clear_favorites_desc");
   }
 
   // ============================================================
@@ -171,10 +171,10 @@ export struct SettingsPage {
   // ============================================================
   @Builder
   buildGroup1() {
-    SettingsGroup({ title: "通用" }) {
+    SettingsGroup({ title: $r("app.string.fs_settings_group_general") }) {
       SettingsItem({
         icon: "🎨",
-        title: "主题模式",
+        title: $r("app.string.fs_settings_theme_mode"),
         itemType: "text",
         value: ThemeManager.label(this.vm.settings.themeMode),
         showDivider: true,
@@ -182,15 +182,15 @@ export struct SettingsPage {
       })
       SettingsItem({
         icon: "🌐",
-        title: "语言",
+        title: $r("app.string.fs_settings_language"),
         itemType: "text",
-        value: this.vm.settings.language === "zh-CN" ? "简体中文" : "English",
+        value: this.vm.settings.language === "zh-CN" ? $r("app.string.fs_settings_lang_zh_cn") : "English",
         showDivider: true,
         onTap: (): void => { this.showLanguagePicker = true; }
       })
       SettingsItem({
         icon: "🔤",
-        title: "字体大小",
+        title: $r("app.string.fs_settings_font_size"),
         itemType: "text",
         value: FontScaleManager.label(this.vm.settings.fontSize),
         showDivider: false,
@@ -204,10 +204,10 @@ export struct SettingsPage {
   // ============================================================
   @Builder
   buildGroup2() {
-    SettingsGroup({ title: "隐私与数据" }) {
+    SettingsGroup({ title: $r("app.string.fs_settings_group_privacy") }) {
       SettingsItem({
         icon: "🛡",
-        title: "个性化推荐",
+        title: $r("app.string.fs_settings_personalized_recommend"),
         itemType: "switch",
         switchOn: this.vm.settings.personalizedRecommend,
         showDivider: true,
@@ -217,7 +217,7 @@ export struct SettingsPage {
       })
       SettingsItem({
         icon: "📋",
-        title: "应用内追踪",
+        title: $r("app.string.fs_settings_app_tracking"),
         itemType: "switch",
         switchOn: this.vm.settings.appTracking,
         showDivider: true,
@@ -227,7 +227,7 @@ export struct SettingsPage {
       })
       SettingsItem({
         icon: "🧹",
-        title: "清理缓存",
+        title: $r("app.string.fs_settings_clear_cache"),
         itemType: "text",
         value: this.vm.cacheSizeText,
         showDivider: true,
@@ -235,14 +235,14 @@ export struct SettingsPage {
       })
       SettingsItem({
         icon: "🕒",
-        title: "清理搜索历史",
+        title: $r("app.string.fs_settings_clear_history"),
         itemType: "action",
         showDivider: true,
         onTap: (): void => { this.vm.requestClear("history"); }
       })
       SettingsItem({
         icon: "❤",
-        title: "清理收藏",
+        title: $r("app.string.fs_settings_clear_favorites"),
         itemType: "action",
         showDivider: false,
         onTap: (): void => { this.vm.requestClear("favorites"); }
@@ -255,10 +255,10 @@ export struct SettingsPage {
   // ============================================================
   @Builder
   buildGroup3() {
-    SettingsGroup({ title: "Web 容器" }) {
+    SettingsGroup({ title: $r("app.string.fs_settings_group_web") }) {
       SettingsItem({
         icon: "🔒",
-        title: "仅在 HTTPS 注入登录态",
+        title: $r("app.string.fs_settings_https_only"),
         itemType: "switch",
         switchOn: this.vm.settings.httpsOnlyToken,
         showDivider: true,
@@ -268,7 +268,7 @@ export struct SettingsPage {
       })
       SettingsItem({
         icon: "📥",
-        title: "启用 JavaScript",
+        title: $r("app.string.fs_settings_js_enabled"),
         itemType: "switch",
         switchOn: this.vm.settings.jsEnabled,
         showDivider: true,
@@ -278,9 +278,9 @@ export struct SettingsPage {
       })
       SettingsItem({
         icon: "🌍",
-        title: "默认浏览器",
+        title: $r("app.string.fs_settings_default_browser"),
         itemType: "text",
-        value: this.vm.settings.defaultBrowser === "system" ? "系统默认" : "应用内打开",
+        value: this.vm.settings.defaultBrowser === "system" ? $r("app.string.fs_settings_browser_system") : $r("app.string.fs_settings_browser_inapp"),
         showDivider: false,
         onTap: (): void => { this.showBrowserPicker = true; }
       })
@@ -292,44 +292,44 @@ export struct SettingsPage {
   // ============================================================
   @Builder
   buildGroup4() {
-    SettingsGroup({ title: "关于" }) {
+    SettingsGroup({ title: $r("app.string.fs_settings_group_about") }) {
       SettingsItem({
         icon: "ℹ",
-        title: "版本",
+        title: $r("app.string.fs_settings_version"),
         itemType: "info",
         value: "1.0.0",
         showDivider: true
       })
       SettingsItem({
         icon: "🔄",
-        title: "检查更新",
+        title: $r("app.string.fs_settings_check_update"),
         itemType: "action",
         showDivider: true,
         onTap: (): void => { this.vm.checkUpdate(); }
       })
       SettingsItem({
         icon: "📄",
-        title: "用户协议",
+        title: $r("app.string.fs_settings_user_agreement"),
         itemType: "action",
         showDivider: true,
         onTap: (): void => { this.navPathStack.pushPath({ name: RouteTable.USER_AGREEMENT }); }
       })
       SettingsItem({
         icon: "🔐",
-        title: "隐私政策",
+        title: $r("app.string.fs_settings_privacy_policy"),
         itemType: "action",
         showDivider: true,
         onTap: (): void => { this.navPathStack.pushPath({ name: RouteTable.PRIVACY_POLICY }); }
       })
       SettingsItem({
         icon: "💡",
-        title: "反馈",
+        title: $r("app.string.fs_settings_feedback"),
         itemType: "action",
         showDivider: false,
         onTap: (): void => {
           const pasteData = pasteboard.createData("text/plain", "feedback@flowsearch.app");
           pasteboard.getSystemPasteboard().setData(pasteData);
-          promptAction.showToast({ message: "邮箱已复制到剪贴板" });
+          promptAction.showToast({ message: $r("app.string.fs_settings_email_copied") });
         }
       })
     }
@@ -349,7 +349,7 @@ export struct SettingsPage {
           .onClick((): void => { this.showThemePicker = false; })
 
         Column() {
-          Text("选择主题")
+          Text($r("app.string.fs_dialog_select_theme"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -358,18 +358,18 @@ export struct SettingsPage {
             .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
 
           Column() {
-            this.buildThemeOption("浅色", "light")
+            this.buildThemeOption($r("app.string.fs_dialog_theme_light"), "light")
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildThemeOption("深色", "dark")
+            this.buildThemeOption($r("app.string.fs_dialog_theme_dark"), "dark")
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildThemeOption("跟随系统", "system")
+            this.buildThemeOption($r("app.string.fs_dialog_theme_system"), "system")
           }
           .width("100%")
           .borderRadius($r("app.float.fs_radius_lg"))
           .backgroundColor($r("app.color.fs_color_surface"))
           .clip(true)
 
-          Text("取消")
+          Text($r("app.string.fs_dialog_cancel"))
             .fontSize($r("app.float.fs_text_body_lg"))
             .fontColor($r("app.color.fs_color_text_primary"))
             .textAlign(TextAlign.Center)
@@ -393,7 +393,7 @@ export struct SettingsPage {
   }
 
   @Builder
-  buildThemeOption(label: string, mode: string) {
+  buildThemeOption(label: ResourceStr, mode: string) {
     Row() {
       Text(label)
         .fontSize($r("app.float.fs_text_body_lg"))
@@ -429,7 +429,7 @@ export struct SettingsPage {
           .onClick((): void => { this.showFontSizePicker = false; })
 
         Column() {
-          Text("字体大小")
+          Text($r("app.string.fs_dialog_font_size_title"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -438,18 +438,18 @@ export struct SettingsPage {
             .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
 
           Column() {
-            this.buildFontSizeOption("小号", "small")
+            this.buildFontSizeOption($r("app.string.fs_dialog_font_small"), "small")
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildFontSizeOption("标准", "standard")
+            this.buildFontSizeOption($r("app.string.fs_dialog_font_standard"), "standard")
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildFontSizeOption("大号", "large")
+            this.buildFontSizeOption($r("app.string.fs_dialog_font_large"), "large")
           }
           .width("100%")
           .borderRadius($r("app.float.fs_radius_lg"))
           .backgroundColor($r("app.color.fs_color_surface"))
           .clip(true)
 
-          Text("取消")
+          Text($r("app.string.fs_dialog_cancel"))
             .fontSize($r("app.float.fs_text_body_lg"))
             .fontColor($r("app.color.fs_color_text_primary"))
             .textAlign(TextAlign.Center)
@@ -473,7 +473,7 @@ export struct SettingsPage {
   }
 
   @Builder
-  buildFontSizeOption(label: string, size: string) {
+  buildFontSizeOption(label: ResourceStr, size: string) {
     Row() {
       Text(label)
         .fontSize($r("app.float.fs_text_body_lg"))
@@ -509,7 +509,7 @@ export struct SettingsPage {
           .onClick((): void => { this.showLanguagePicker = false; })
 
         Column() {
-          Text("选择语言")
+          Text($r("app.string.fs_dialog_select_language"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -518,7 +518,7 @@ export struct SettingsPage {
             .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
 
           Column() {
-            this.buildLanguageOption("简体中文", "zh-CN")
+            this.buildLanguageOption($r("app.string.fs_settings_lang_zh_cn"), "zh-CN")
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
             this.buildLanguageOption("English", "en-US")
           }
@@ -527,7 +527,7 @@ export struct SettingsPage {
           .backgroundColor($r("app.color.fs_color_surface"))
           .clip(true)
 
-          Text("取消")
+          Text($r("app.string.fs_dialog_cancel"))
             .fontSize($r("app.float.fs_text_body_lg"))
             .fontColor($r("app.color.fs_color_text_primary"))
             .textAlign(TextAlign.Center)
@@ -551,7 +551,7 @@ export struct SettingsPage {
   }
 
   @Builder
-  buildLanguageOption(label: string, lang: string) {
+  buildLanguageOption(label: ResourceStr, lang: string) {
     Row() {
       Text(label)
         .fontSize($r("app.float.fs_text_body_lg"))
@@ -587,7 +587,7 @@ export struct SettingsPage {
           .onClick((): void => { this.showBrowserPicker = false; })
 
         Column() {
-          Text("默认浏览器")
+          Text($r("app.string.fs_dialog_browser_title"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -596,16 +596,16 @@ export struct SettingsPage {
             .padding({ top: $r("app.float.fs_space_lg"), bottom: $r("app.float.fs_space_md") })
 
           Column() {
-            this.buildBrowserOption("系统默认", "system")
+            this.buildBrowserOption($r("app.string.fs_settings_browser_system"), "system")
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildBrowserOption("应用内打开", "inapp")
+            this.buildBrowserOption($r("app.string.fs_settings_browser_inapp"), "inapp")
           }
           .width("100%")
           .borderRadius($r("app.float.fs_radius_lg"))
           .backgroundColor($r("app.color.fs_color_surface"))
           .clip(true)
 
-          Text("取消")
+          Text($r("app.string.fs_dialog_cancel"))
             .fontSize($r("app.float.fs_text_body_lg"))
             .fontColor($r("app.color.fs_color_text_primary"))
             .textAlign(TextAlign.Center)
@@ -629,7 +629,7 @@ export struct SettingsPage {
   }
 
   @Builder
-  buildBrowserOption(label: string, browser: string) {
+  buildBrowserOption(label: ResourceStr, browser: string) {
     Row() {
       Text(label)
         .fontSize($r("app.float.fs_text_body_lg"))

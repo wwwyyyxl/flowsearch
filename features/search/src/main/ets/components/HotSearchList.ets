@@ -20,7 +20,7 @@ export struct HotSearchList {
   build() {
     Column() {
       // 标题行
-      Text("大家在搜")
+      Text($r("app.string.fs_search_hot_title"))
         .fontSize($r("app.float.fs_text_body_lg"))
         .fontWeight(FontWeight.Bold)
         .fontColor($r("app.color.fs_color_text_primary"))

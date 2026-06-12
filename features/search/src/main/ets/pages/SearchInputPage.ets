@@ -139,7 +139,7 @@ export struct SearchInputPage {
     } else {
       // 无匹配建议
       Column() {
-        Text("没有相关建议")
+        Text($r("app.string.fs_search_no_suggestions"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_text_tertiary"))
       }

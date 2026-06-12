@@ -23,7 +23,7 @@ export struct FavsArticleCard {
     targetUrl: "", favorite: false, channelId: ""
   });
   @Param showRemoveButton: boolean = true;
-  @Param removeLabel: string = "取消收藏";
+  @Param removeLabel: ResourceStr = $r("app.string.fs_favs_unfavorite");
   @Event onCardTap: (article: Article) => void = (_a: Article): void => {};
   @Event onRemoveTap: (articleId: string) => void = (_id: string): void => {};
 

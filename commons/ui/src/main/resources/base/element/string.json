@@ -3,6 +3,30 @@
     {
       "name": "module_desc",
       "value": "FlowSearch shared UI components module"
+    },
+    {
+      "name": "fs_state_loading",
+      "value": "加载中..."
+    },
+    {
+      "name": "fs_state_load_error",
+      "value": "加载失败"
+    },
+    {
+      "name": "fs_state_retry",
+      "value": "重试"
+    },
+    {
+      "name": "fs_state_empty",
+      "value": "暂无内容"
+    },
+    {
+      "name": "fs_state_offline_hint",
+      "value": "数据来自缓存,下拉刷新"
+    },
+    {
+      "name": "fs_state_error_code",
+      "value": "错误码"
     }
   ]
 }

@@ -28,26 +28,26 @@ export struct ExternalConfirmDialog {
           .onClick((): void => { this.onCancelTap(); })
 
         Column() {
-          Text("即将打开外部应用")
+          Text($r("app.string.fs_web_external_title"))
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
             .alignSelf(ItemAlign.Start)
 
-          Text(`目标: ${this.targetUrl}\n确认要离开 FlowSearch 吗?`)
+          Text($r("app.string.fs_web_external_target") + ": " + this.targetUrl + "\n" + $r("app.string.fs_web_external_confirm_msg"))
             .fontSize($r("app.float.fs_text_body"))
             .fontColor($r("app.color.fs_color_text_secondary"))
             .alignSelf(ItemAlign.Start)
             .margin({ top: $r("app.float.fs_space_md") })
 
           Row({ space: 16 }) {
-            Text("取消")
+            Text($r("app.string.fs_web_cancel"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_secondary"))
               .padding({ left: 12, right: 12, top: 10, bottom: 10 })
               .onClick((): void => { this.onCancelTap(); })
 
-            Button("打开")
+            Button($r("app.string.fs_web_external_confirm"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_inverse"))
               .backgroundColor($r("app.color.fs_color_primary"))

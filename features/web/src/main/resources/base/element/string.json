@@ -3,6 +3,94 @@
     {
       "name": "module_desc",
       "value": "FlowSearch web container feature module"
+    },
+    {
+      "name": "fs_web_page_error",
+      "value": "页面加载失败"
+    },
+    {
+      "name": "fs_web_error_subtitle",
+      "value": "可能是网络异常或目标页面暂时不可用"
+    },
+    {
+      "name": "fs_web_reload",
+      "value": "重新加载"
+    },
+    {
+      "name": "fs_web_back",
+      "value": "返回上一页"
+    },
+    {
+      "name": "fs_web_back_home",
+      "value": "返回首页"
+    },
+    {
+      "name": "fs_web_slow_load_hint",
+      "value": "页面加载较慢,请检查网络"
+    },
+    {
+      "name": "fs_web_stop",
+      "value": "停止"
+    },
+    {
+      "name": "fs_web_login_expired_title",
+      "value": "登录已过期"
+    },
+    {
+      "name": "fs_web_login_expired_desc",
+      "value": "请重新登录后继续访问该页面"
+    },
+    {
+      "name": "fs_web_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "fs_web_relogin",
+      "value": "重新登录"
+    },
+    {
+      "name": "fs_web_external_title",
+      "value": "即将打开外部应用"
+    },
+    {
+      "name": "fs_web_external_confirm",
+      "value": "打开"
+    },
+    {
+      "name": "fs_web_refresh",
+      "value": "刷新"
+    },
+    {
+      "name": "fs_web_open_in_browser",
+      "value": "在浏览器中打开"
+    },
+    {
+      "name": "fs_web_copy_link",
+      "value": "复制链接"
+    },
+    {
+      "name": "fs_web_share",
+      "value": "分享"
+    },
+    {
+      "name": "fs_web_favorite",
+      "value": "收藏"
+    },
+    {
+      "name": "fs_web_unfavorite",
+      "value": "取消收藏"
+    },
+    {
+      "name": "fs_web_error_code",
+      "value": "错误码"
+    },
+    {
+      "name": "fs_web_external_target",
+      "value": "目标"
+    },
+    {
+      "name": "fs_web_external_confirm_msg",
+      "value": "确认打开该应用?"
     }
   ]
 }

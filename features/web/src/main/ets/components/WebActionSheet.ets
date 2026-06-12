@@ -39,17 +39,17 @@ export struct WebActionSheet {
         Column() {
           // 4 个操作选项
           Column() {
-            this.buildActionItem("🔄", "刷新", (): void => { this.onRefreshTap(); })
+            this.buildActionItem("🔄", $r("app.string.fs_web_refresh"), (): void => { this.onRefreshTap(); })
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildActionItem("🌐", "在浏览器中打开", (): void => { this.onOpenInBrowserTap(); })
+            this.buildActionItem("🌐", $r("app.string.fs_web_open_in_browser"), (): void => { this.onOpenInBrowserTap(); })
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildActionItem("📋", "复制链接", (): void => { this.onCopyLinkTap(); })
+            this.buildActionItem("📋", $r("app.string.fs_web_copy_link"), (): void => { this.onCopyLinkTap(); })
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
-            this.buildActionItem("↗", "分享", (): void => { this.onShareTap(); })
+            this.buildActionItem("↗", $r("app.string.fs_web_share"), (): void => { this.onShareTap(); })
             Divider().strokeWidth(0.5).color($r("app.color.fs_color_border")).opacity(0.5)
             this.buildActionItem(
               this.isFavorited ? "⭐" : "☆",
-              this.isFavorited ? "取消收藏" : "收藏",
+              this.isFavorited ? $r("app.string.fs_web_unfavorite") : $r("app.string.fs_web_favorite"),
               (): void => { this.onFavoriteTap(); }
             )
           }
@@ -59,7 +59,7 @@ export struct WebActionSheet {
           .clip(true)
 
           // 取消按钮
-          Text("取消")
+          Text($r("app.string.fs_web_cancel"))
             .fontSize($r("app.float.fs_text_body_lg"))
             .fontColor($r("app.color.fs_color_text_primary"))
             .textAlign(TextAlign.Center)
@@ -85,7 +85,7 @@ export struct WebActionSheet {
   }
 
   @Builder
-  buildActionItem(icon: string, label: string, handler: () => void) {
+  buildActionItem(icon: string, label: ResourceStr, handler: () => void) {
     Row({ space: 12 }) {
       Text(icon)
         .fontSize(18)

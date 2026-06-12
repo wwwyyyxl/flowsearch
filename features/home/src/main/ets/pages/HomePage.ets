@@ -196,7 +196,7 @@ export struct HomePage {
               .width(20)
               .height(20)
               .color($r("app.color.fs_color_primary"))
-            Text("加载中")
+            Text($r("app.string.fs_home_loading"))
               .fontSize($r("app.float.fs_text_caption"))
               .fontColor($r("app.color.fs_color_text_tertiary"))
           }
@@ -204,7 +204,7 @@ export struct HomePage {
           .height(56)
           .justifyContent(FlexAlign.Center)
         } else if (!this.vm.hasMore) {
-          Text("没有更多了")
+          Text($r("app.string.fs_home_no_more"))
             .fontSize($r("app.float.fs_text_caption"))
             .fontColor($r("app.color.fs_color_text_tertiary"))
             .width("100%")

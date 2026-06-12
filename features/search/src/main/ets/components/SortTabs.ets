@@ -14,15 +14,15 @@ import { SortType } from "@flowsearch/base";
 
 interface SortOption {
   key: SortType;
-  label: string;
+  label: ResourceStr;
 }
 
 const SORT_OPTIONS: Array<SortOption> = [
-  { key: "RELEVANCE",    label: "综合" },
-  { key: "LATEST",       label: "最新" },
-  { key: "HOTTEST",      label: "最热" },
-  { key: "TOOL_ONLY",    label: "仅工具" },
-  { key: "ARTICLE_ONLY", label: "仅文章" }
+  { key: "RELEVANCE",    label: $r("app.string.fs_search_sort_relevance") },
+  { key: "LATEST",       label: $r("app.string.fs_search_sort_newest") },
+  { key: "HOTTEST",      label: $r("app.string.fs_search_sort_hottest") },
+  { key: "TOOL_ONLY",    label: $r("app.string.fs_search_sort_tool_only") },
+  { key: "ARTICLE_ONLY", label: $r("app.string.fs_search_sort_article_only") }
 ];
 
 @ComponentV2
