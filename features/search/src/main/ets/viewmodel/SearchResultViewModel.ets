@@ -29,7 +29,7 @@
 
 import { PageState, Article, SearchResultData, AiQuickAnswer, SortType } from "@flowsearch/base";
 import { FavoritesRepository } from "@flowsearch/favs";
-import { SearchRepository, SearchRepoError } from "../repo/SearchRepository";
+import { SearchRepository, SearchRepoError, SearchFetchMoreResult } from "../repo/SearchRepository";
 import { SimulationMode } from "../repo/SimulationMode";
 import { SearchResultDataSource } from "./SearchResultDataSource";
 
@@ -46,6 +46,15 @@ export class SearchResultViewModel {
 
   /** 调试用模拟模式。 */
   @Trace simulationMode: SimulationMode = "normal";
+
+  /** S17:无限滚动:是否正在加载更多。 */
+  @Trace isLoadingMore: boolean = false;
+
+  /** S17:无限滚动:是否还有更多数据。 */
+  @Trace hasMore: boolean = true;
+
+  /** S17:下一页页码(0-based)。 */
+  private nextPage: number = 0;
 
   /** LazyForEach 数据源,VM 持有。 */
   readonly dataSource: SearchResultDataSource = new SearchResultDataSource();
@@ -83,6 +92,69 @@ export class SearchResultViewModel {
   changeSimulationMode(mode: SimulationMode): void {
     this.simulationMode = mode;
     this.loadResults();
+  }
+
+  /**
+   * S17:下拉刷新。保留 AI 卡,只重拉结果列表。
+   * 返回 Promise,Page 层在完成后置 isRefreshing=false。
+   */
+  async refreshResults(): Promise<void> {
+    const prevAi: AiQuickAnswer | null = this.state.isContent()
+      ? (this.state.data as SearchResultData).aiAnswer
+      : null;
+    try {
+      const articles: Array<Article> = await this.repository.fetchResults(
+        this.keyword, this.sortType, this.simulationMode
+      );
+      if (articles.length === 0) {
+        this.state = PageState.empty();
+        this.dataSource.setArticles(new Array());
+      } else {
+        const data = new SearchResultData(this.keyword, prevAi, articles);
+        this.state = PageState.content(data);
+        this.dataSource.setArticles(articles);
+      }
+      // 重置分页
+      this.hasMore = true;
+      this.isLoadingMore = false;
+      this.nextPage = 1;
+    } catch (_err) {
+      // 静默失败,保留当前数据
+    }
+  }
+
+  /**
+   * S17:上拉加载更多。
+   * 防重复:isLoadingMore 或 !hasMore 时直接返回。
+   */
+  loadMore(): void {
+    if (this.isLoadingMore || !this.hasMore) {
+      return;
+    }
+    this.isLoadingMore = true;
+
+    this.repository.fetchMore(this.keyword, this.sortType, this.nextPage, this.simulationMode)
+      .then((result: SearchFetchMoreResult): void => {
+        if (this.state.isContent()) {
+          const oldData = this.state.data as SearchResultData;
+          const merged: Array<Article> = new Array();
+          for (let i = 0; i < oldData.articles.length; i++) {
+            merged.push(oldData.articles[i]);
+          }
+          for (let i = 0; i < result.articles.length; i++) {
+            merged.push(result.articles[i]);
+          }
+          const nextData = new SearchResultData(oldData.keyword, oldData.aiAnswer, merged);
+          this.state = PageState.content(nextData);
+          this.dataSource.setArticles(merged);
+        }
+        this.hasMore = result.hasMore;
+        this.nextPage = this.nextPage + 1;
+        this.isLoadingMore = false;
+      })
+      .catch((_err: object): void => {
+        this.isLoadingMore = false;
+      });
   }
 
   /** 收藏 toggle:不可变更新当前 SearchResultData 里的对应 Article + 持久化。 */
@@ -140,6 +212,10 @@ export class SearchResultViewModel {
           this.state = PageState.content(data);
           this.dataSource.setArticles(articles);
         }
+        // S17:重置分页
+        this.hasMore = true;
+        this.isLoadingMore = false;
+        this.nextPage = 1;
         // 等 AI 速答(可能更晚到)
         aiPromise.then((ai: AiQuickAnswer | null): void => {
           this.applyAiAnswerIfStillCurrent(ai);

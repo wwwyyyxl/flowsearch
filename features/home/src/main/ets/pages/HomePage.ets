@@ -56,6 +56,9 @@ export struct HomePage {
   /** ViewModel,@Local 让本组件持有引用,VM 的 @Trace 字段变化自动触发本组件重渲。 */
   @Local vm: HomeViewModel = new HomeViewModel();
 
+  /** S17:下拉刷新状态。Refresh 组件通过 $$ 双向绑定。 */
+  @Local isRefreshing: boolean = false;
+
   aboutToAppear(): void {
     this.vm.init(getContext(this));
   }
@@ -134,18 +137,25 @@ export struct HomePage {
       }
       .margin({ top: $r("app.float.fs_space_lg") })
 
-      // ===== 6. Feed 状态分发区 =====
-      Column() {
-        StateHost({
-          state: this.vm.getCurrentState(),
-          onRetry: (): void => { this.vm.retryCurrent(); },
-          emptyTitle: "这个频道暂无内容",
-          emptySubtitle: "试试其他频道",
-          contentBuilder: (): void => {
-            this.buildFeed();
-          }
-        })
+      // ===== 6. Feed 状态分发区(Refresh 包裹,支持下拉刷新) =====
+      Refresh({ refreshing: $$this.isRefreshing }) {
+        Column() {
+          StateHost({
+            state: this.vm.getCurrentState(),
+            onRetry: (): void => { this.vm.retryCurrent(); },
+            emptyTitle: "这个频道暂无内容",
+            emptySubtitle: "试试其他频道",
+            contentBuilder: (): void => {
+              this.buildFeed();
+            }
+          })
+        }
+        .width("100%")
+        .height("100%")
       }
+      .onRefreshing((): void => {
+        this.vm.refreshFeed();
+      })
       .layoutWeight(1)
       .width("100%")
     }
@@ -223,6 +233,7 @@ export struct HomePage {
       bottom: $r("app.float.fs_space_md")
     })
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .onReachEnd((): void => { this.vm.loadMore(); })
   }
 

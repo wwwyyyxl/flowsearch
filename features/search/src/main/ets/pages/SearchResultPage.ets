@@ -64,6 +64,9 @@ export struct SearchResultPage {
 
   @Local vm: SearchResultViewModel = new SearchResultViewModel();
 
+  /** S17:下拉刷新状态。Refresh 组件通过 $$ 双向绑定。 */
+  @Local isRefreshing: boolean = false;
+
   aboutToAppear(): void {
     this.vm.init(this.keyword, getContext(this));
   }
@@ -89,21 +92,29 @@ export struct SearchResultPage {
           onSortChange: (sort: SortType): void => { this.vm.changeSort(sort); }
         })
 
-        // 3. 主体内容(状态分发)
-        Column() {
-          if (this.vm.state.isLoading() || this.vm.state.isIdle()) {
-            this.buildLoading()
-          } else if (this.vm.state.isEmpty()) {
-            this.buildEmpty()
-          } else if (this.vm.state.isError()) {
-            this.buildError()
-          } else {
-            // data 在外层算好传入 @Builder:
-            // ArkTS @Builder 体内不允许变量声明(只允许 UI 组件语法 + if/ForEach),
-            // 所以 cast 必须在 build() 体里做,Builder 只读参数。
-            this.buildContent(castToSearchResultData(this.vm.state))
+        // 3. 主体内容(Refresh 包裹,支持下拉刷新)
+        Refresh({ refreshing: $$this.isRefreshing }) {
+          Column() {
+            if (this.vm.state.isLoading() || this.vm.state.isIdle()) {
+              this.buildLoading()
+            } else if (this.vm.state.isEmpty()) {
+              this.buildEmpty()
+            } else if (this.vm.state.isError()) {
+              this.buildError()
+            } else {
+              this.buildContent(castToSearchResultData(this.vm.state))
+            }
           }
+          .layoutWeight(1)
+          .width("100%")
         }
+        .onRefreshing((): void => {
+          this.vm.refreshResults().then((): void => {
+            this.isRefreshing = false;
+          }).catch((_e: object): void => {
+            this.isRefreshing = false;
+          });
+        })
         .layoutWeight(1)
         .width("100%")
       }
@@ -351,10 +362,43 @@ export struct SearchResultPage {
         },
         (article: Article): string => `${this.vm.keyword}_${article.articleId}`
       )
+
+      // S17:底部:LoadingMore / 没有更多
+      ListItem() {
+        if (this.vm.isLoadingMore) {
+          Row({ space: 8 }) {
+            LoadingProgress()
+              .width(20)
+              .height(20)
+              .color($r("app.color.fs_color_primary"))
+            Text($r("app.string.fs_search_loading"))
+              .fontSize($r("app.float.fs_text_caption"))
+              .fontColor($r("app.color.fs_color_text_tertiary"))
+          }
+          .width("100%")
+          .height(56)
+          .justifyContent(FlexAlign.Center)
+        } else if (!this.vm.hasMore) {
+          Text($r("app.string.fs_search_no_more"))
+            .fontSize($r("app.float.fs_text_caption"))
+            .fontColor($r("app.color.fs_color_text_tertiary"))
+            .width("100%")
+            .height(56)
+            .textAlign(TextAlign.Center)
+        }
+      }
     }
     .cachedCount(5)
     .width("100%")
     .height("100%")
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+    .onScrollIndex((_start: number, end: number): void => {
+      // S17:触底检测:当最后一条可见时触发加载更多
+      const totalCount: number = this.vm.dataSource.totalCount();
+      if (end >= totalCount - 1 && totalCount > 0) {
+        this.vm.loadMore();
+      }
+    })
   }
 }

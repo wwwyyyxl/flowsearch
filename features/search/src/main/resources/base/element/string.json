@@ -87,6 +87,14 @@
     {
       "name": "fs_search_copied",
       "value": "已复制到剪贴板"
+    },
+    {
+      "name": "fs_search_loading",
+      "value": "加载中"
+    },
+    {
+      "name": "fs_search_no_more",
+      "value": "没有更多了"
     }
   ]
 }

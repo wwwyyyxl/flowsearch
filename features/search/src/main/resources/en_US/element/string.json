@@ -87,6 +87,14 @@
     {
       "name": "fs_search_copied",
       "value": "Copied to clipboard"
+    },
+    {
+      "name": "fs_search_loading",
+      "value": "Loading"
+    },
+    {
+      "name": "fs_search_no_more",
+      "value": "No more results"
     }
   ]
 }

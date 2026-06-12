@@ -37,6 +37,9 @@ const DELAY_NORMAL_MS: number = 200;
 const DELAY_ERROR_MS: number = 500;
 const DELAY_SLOW_MS: number = 3000;
 
+/** S17:Mock 分页:每页条数。 */
+const SEARCH_PAGE_SIZE: number = 3;
+
 /** AI 速答超时阈值(PRD §04-03 §6:"接口请求超时 2s")。 */
 const AI_ANSWER_TIMEOUT_MS: number = 2000;
 
@@ -47,6 +50,17 @@ export class SearchRepoError extends Error {
   constructor(errorCode: string, message: string) {
     super(message);
     this.errorCode = errorCode;
+  }
+}
+
+/** S17:fetchMore 返回值。 */
+export class SearchFetchMoreResult {
+  readonly articles: Array<Article> = new Array();
+  readonly hasMore: boolean = true;
+
+  constructor(articles: Array<Article>, hasMore: boolean) {
+    this.articles = articles;
+    this.hasMore = hasMore;
   }
 }
 
@@ -116,6 +130,54 @@ export class SearchRepository {
     const timeoutPromise: Promise<AiQuickAnswer | null> = SearchRepository.sleep(AI_ANSWER_TIMEOUT_MS).then((): AiQuickAnswer | null => null);
 
     return Promise.race([dataPromise, timeoutPromise]);
+  }
+
+  /**
+   * S17:Mock 分页:取搜索结果的第 page 页(0-based)。
+   * Mock 数据量小,用 cycle + suffix 模拟更多数据,最多返回 3 页。
+   */
+  async fetchMore(
+    keyword: string,
+    sort: SortType,
+    page: number,
+    mode: SimulationMode
+  ): Promise<SearchFetchMoreResult> {
+    const delayMs: number = SearchRepository.pickDelay(mode);
+    await SearchRepository.sleep(delayMs);
+
+    if (mode === "error") {
+      throw new SearchRepoError("500", "加载更多失败");
+    }
+
+    // Mock:最多 3 页
+    const maxPages: number = 3;
+    if (page >= maxPages) {
+      return new SearchFetchMoreResult(new Array(), false);
+    }
+
+    // 循环复用基础结果,加后缀区分 articleId
+    const base: Array<Article> = SearchMock.getResults(keyword, sort);
+    const start: number = page * SEARCH_PAGE_SIZE;
+    const articles: Array<Article> = new Array();
+    for (let i = 0; i < SEARCH_PAGE_SIZE; i++) {
+      const src: Article = base[(start + i) % base.length];
+      articles.push(new Article({
+        articleId: src.articleId + "_p" + page + "_" + i,
+        title: src.title,
+        summary: src.summary,
+        coverUrl: src.coverUrl,
+        coverPlaceholder: src.coverPlaceholder,
+        categoryTag: src.categoryTag,
+        source: src.source,
+        publishTime: src.publishTime,
+        publishTimeDisplay: src.publishTimeDisplay,
+        targetUrl: src.targetUrl,
+        favorite: src.favorite,
+        channelId: src.channelId
+      }));
+    }
+    const hasMore: boolean = (page + 1) < maxPages;
+    return new SearchFetchMoreResult(articles, hasMore);
   }
 
   private static pickDelay(mode: SimulationMode): number {

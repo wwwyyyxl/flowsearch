@@ -193,6 +193,62 @@ export class HomeViewModel {
   }
 
   /**
+   * S17:下拉刷新。重新拉取当前频道数据。
+   * 不走 Loading 态(保留当前内容),成功后直接替换 Content。
+   * 失败静默(保留当前数据,不弹 Error 页)。
+   * 返回 Promise,Page 层在 .then/.catch 后置 isRefreshing=false。
+   */
+  async refreshFeed(): Promise<void> {
+    if (this.currentChannelId === "fav") {
+      await this.refreshFavorites();
+      return;
+    }
+    try {
+      const data: HomeFeedData = await this.repository.fetchFeed(
+        this.currentChannelId, this.simulationMode
+      );
+      if (this.channels.length === 0 && data.channels.length > 0) {
+        this.channels = data.channels;
+      }
+      if (this.quickEntries.length === 0 && data.quickEntries.length > 0) {
+        this.quickEntries = data.quickEntries;
+      }
+      if (data.articles.length === 0) {
+        this.updateState(this.currentChannelId, PageState.empty());
+        this.feedDataSource.setArticles(new Array());
+      } else {
+        this.updateState(this.currentChannelId, PageState.content(data));
+        this.feedDataSource.setArticles(data.articles);
+      }
+      // 重置分页
+      this.hasMore = true;
+      this.isLoadingMore = false;
+      const resetNext: Map<string, number> = new Map(this.nextPage);
+      resetNext.set(this.currentChannelId, 0);
+      this.nextPage = resetNext;
+    } catch (_err) {
+      // 静默失败,保留当前数据
+    }
+  }
+
+  /** S17:刷新收藏频道(从 Preferences 重新读取)。 */
+  private async refreshFavorites(): Promise<void> {
+    try {
+      const articles: Array<Article> = await this.favRepo.loadAll();
+      const data: HomeFeedData = new HomeFeedData(this.channels, this.quickEntries, articles);
+      if (articles.length === 0) {
+        this.updateState("fav", PageState.empty());
+        this.feedDataSource.setArticles(new Array());
+      } else {
+        this.updateState("fav", PageState.content(data));
+        this.feedDataSource.setArticles(articles);
+      }
+    } catch (_err) {
+      // 静默失败
+    }
+  }
+
+  /**
    * 切换某文章的收藏态。
    * S4 改进:不再纯内存 toggle,同时异步持久化到 Preferences。
    * 不可变更新:用 Article.withFavorite + 重建文章列表。
