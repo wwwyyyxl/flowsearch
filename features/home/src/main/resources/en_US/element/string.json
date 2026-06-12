@@ -6,35 +6,35 @@
     },
     {
       "name": "fs_home_loading",
-      "value": "加载中"
+      "value": "Loading"
     },
     {
       "name": "fs_home_no_more",
-      "value": "没有更多了"
+      "value": "No more items"
     },
     {
       "name": "fs_home_search_placeholder",
-      "value": "搜索网页、工具、历史记录"
+      "value": "Search web, tools, history"
     },
     {
       "name": "fs_home_channel_empty_title",
-      "value": "这个频道暂无内容"
+      "value": "No content in this channel"
     },
     {
       "name": "fs_home_channel_empty_subtitle",
-      "value": "试试其他频道"
+      "value": "Try other channels"
     },
     {
       "name": "fs_home_subtitle",
-      "value": "搜索、工具与内容聚合"
+      "value": "Search, tools & content aggregation"
     },
     {
       "name": "fs_home_quick_tools",
-      "value": "快捷工具"
+      "value": "Quick tools"
     },
     {
       "name": "fs_home_all",
-      "value": "全部"
+      "value": "All"
     }
   ]
 }

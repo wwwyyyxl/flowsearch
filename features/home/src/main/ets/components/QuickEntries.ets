@@ -30,13 +30,13 @@ export struct QuickEntries {
     Column() {
       // 顶部行:标题 + "全部"链接
       Row() {
-        Text("快捷工具")
+        Text($r("app.string.fs_home_quick_tools"))
           .fontSize($r("app.float.fs_text_title_2"))
           .fontWeight(FontWeight.Bold)
           .fontColor($r("app.color.fs_color_text_primary"))
           .layoutWeight(1)
 
-        Text("全部")
+        Text($r("app.string.fs_home_all"))
           .fontSize($r("app.float.fs_text_body"))
           .fontColor($r("app.color.fs_color_primary"))
       }

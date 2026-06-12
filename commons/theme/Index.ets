@@ -39,14 +39,14 @@ export class ThemeManager {
     }
   }
 
-  static label(mode: string): string {
+  static label(mode: string): Resource {
     if (mode === "light") {
-      return "浅色";
+      return $r("app.string.fs_theme_light");
     }
     if (mode === "dark") {
-      return "深色";
+      return $r("app.string.fs_theme_dark");
     }
-    return "跟随系统";
+    return $r("app.string.fs_theme_system");
   }
 }
 
@@ -71,13 +71,13 @@ export class FontScaleManager {
     }
   }
 
-  static label(size: string): string {
+  static label(size: string): Resource {
     if (size === "small") {
-      return "小号";
+      return $r("app.string.fs_font_small");
     }
     if (size === "large") {
-      return "大号";
+      return $r("app.string.fs_font_large");
     }
-    return "标准";
+    return $r("app.string.fs_font_standard");
   }
 }

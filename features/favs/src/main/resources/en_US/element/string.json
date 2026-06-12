@@ -1,0 +1,100 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "FlowSearch favorites and history feature module"
+    },
+    {
+      "name": "fs_favs_page_title",
+      "value": "Favorites & History"
+    },
+    {
+      "name": "fs_favs_tab_favorites",
+      "value": "Favorites"
+    },
+    {
+      "name": "fs_favs_tab_history",
+      "value": "History"
+    },
+    {
+      "name": "fs_favs_manage",
+      "value": "Manage"
+    },
+    {
+      "name": "fs_favs_done",
+      "value": "Done"
+    },
+    {
+      "name": "fs_favs_select_all",
+      "value": "Select all"
+    },
+    {
+      "name": "fs_favs_unfavorite",
+      "value": "Unfavorite"
+    },
+    {
+      "name": "fs_favs_group_today",
+      "value": "Today"
+    },
+    {
+      "name": "fs_favs_group_yesterday",
+      "value": "Yesterday"
+    },
+    {
+      "name": "fs_favs_group_this_week",
+      "value": "Earlier this week"
+    },
+    {
+      "name": "fs_favs_group_earlier",
+      "value": "Earlier"
+    },
+    {
+      "name": "fs_favs_history_load_error",
+      "value": "Failed to load history"
+    },
+    {
+      "name": "fs_favs_no_favorites",
+      "value": "No favorites"
+    },
+    {
+      "name": "fs_favs_no_history",
+      "value": "No history"
+    },
+    {
+      "name": "fs_favs_no_favorites_hint",
+      "value": "No favorites yet"
+    },
+    {
+      "name": "fs_favs_collect_hint",
+      "value": "Tap the save button while browsing articles"
+    },
+    {
+      "name": "fs_favs_fav_load_error",
+      "value": "Failed to load favorites"
+    },
+    {
+      "name": "fs_favs_retry",
+      "value": "Retry"
+    },
+    {
+      "name": "fs_favs_all_prefix",
+      "value": "All"
+    },
+    {
+      "name": "fs_favs_no_history_hint",
+      "value": "No search history yet"
+    },
+    {
+      "name": "fs_favs_history_record_hint",
+      "value": "Searches are recorded automatically"
+    },
+    {
+      "name": "fs_favs_history_count_suffix",
+      "value": " history entries"
+    },
+    {
+      "name": "fs_favs_clear_all",
+      "value": "Clear all"
+    }
+  ]
+}

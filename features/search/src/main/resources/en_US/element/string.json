@@ -6,47 +6,47 @@
     },
     {
       "name": "fs_search_input_placeholder",
-      "value": "搜索"
+      "value": "Search"
     },
     {
       "name": "fs_search_full_placeholder",
-      "value": "搜索网页、工具、历史记录"
+      "value": "Search web, tools, history"
     },
     {
       "name": "fs_search_cancel",
-      "value": "取消"
+      "value": "Cancel"
     },
     {
       "name": "fs_search_hot_title",
-      "value": "大家在搜"
+      "value": "Trending searches"
     },
     {
       "name": "fs_search_history_title",
-      "value": "搜索历史"
+      "value": "Search history"
     },
     {
       "name": "fs_search_sort_relevance",
-      "value": "综合"
+      "value": "Relevance"
     },
     {
       "name": "fs_search_sort_newest",
-      "value": "最新"
+      "value": "Latest"
     },
     {
       "name": "fs_search_sort_hottest",
-      "value": "最热"
+      "value": "Popular"
     },
     {
       "name": "fs_search_sort_tool_only",
-      "value": "仅工具"
+      "value": "Tools only"
     },
     {
       "name": "fs_search_sort_article_only",
-      "value": "仅文章"
+      "value": "Articles only"
     },
     {
       "name": "fs_search_ai_answer",
-      "value": "AI 速答"
+      "value": "AI Quick Answer"
     },
     {
       "name": "fs_search_ai_mock",
@@ -54,39 +54,39 @@
     },
     {
       "name": "fs_search_copy",
-      "value": "复制"
+      "value": "Copy"
     },
     {
       "name": "fs_search_no_results",
-      "value": "未找到"
+      "value": "Not found"
     },
     {
       "name": "fs_search_try_other_keywords",
-      "value": "建议换个关键词"
+      "value": "Try different keywords"
     },
     {
       "name": "fs_search_back_home",
-      "value": "返回首页"
+      "value": "Back to home"
     },
     {
       "name": "fs_search_error",
-      "value": "搜索失败"
+      "value": "Search failed"
     },
     {
       "name": "fs_search_error_code",
-      "value": "错误码"
+      "value": "Error code"
     },
     {
       "name": "fs_search_retry",
-      "value": "重试"
+      "value": "Retry"
     },
     {
       "name": "fs_search_no_suggestions",
-      "value": "没有相关建议"
+      "value": "No suggestions"
     },
     {
       "name": "fs_search_copied",
-      "value": "已复制到剪贴板"
+      "value": "Copied to clipboard"
     }
   ]
 }

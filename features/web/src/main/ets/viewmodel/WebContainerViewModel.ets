@@ -32,7 +32,6 @@
  *    保持 PageState 不可变契约,@Trace 才稳触发。
  */
 
-import promptAction from "@ohos.promptAction";
 import pasteboard from "@ohos.pasteboard";
 import { PageState, WebContainerData, WebInterceptRule, WebInterceptAction, Article } from "@flowsearch/base";
 import { WebRepository } from "../repo/WebRepository";
@@ -81,6 +80,9 @@ export class WebContainerViewModel {
 
   /** 当前文章是否已收藏。 */
   @Trace isFavorited: boolean = false;
+
+  /** Toast 消息(由 Page 层 @Monitor 监听并展示)。 */
+  @Trace toastMessage: string = "";
 
   private readonly repository: WebRepository = new WebRepository();
 
@@ -217,12 +219,12 @@ export class WebContainerViewModel {
     }
 
     if (action === "INTERCEPT_PAY") {
-      promptAction.showToast({ message: "演示版不支持真实支付" });
+      this.toastMessage = "payment_not_supported";
       return true;
     }
 
     if (action === "INTERCEPT_DOWNLOAD") {
-      promptAction.showToast({ message: "已识别下载链接(演示)" });
+      this.toastMessage = "download_detected";
       return true;
     }
 
@@ -338,9 +340,9 @@ export class WebContainerViewModel {
     const pasteData: pasteboard.PasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, data.currentUrl);
     const systemPasteboard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard();
     systemPasteboard.setData(pasteData).then((): void => {
-      promptAction.showToast({ message: "链接已复制" });
+      this.toastMessage = "link_copied";
     }).catch((_err: object): void => {
-      promptAction.showToast({ message: "复制失败" });
+      this.toastMessage = "copy_failed";
     });
     this.showMoreMenu = false;
   }

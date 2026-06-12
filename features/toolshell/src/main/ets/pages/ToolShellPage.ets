@@ -23,7 +23,7 @@ export struct ToolShellPage {
             .fontSize(20)
             .fontColor($r("app.color.fs_color_text_primary"))
             .onClick((): void => { this.navPathStack.pop(); })
-          Text(this.getTitle())
+          Text(this.getTitleResource())
             .fontSize($r("app.float.fs_text_title_2"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
@@ -49,14 +49,14 @@ export struct ToolShellPage {
           .height(96)
 
           // 3. 工具名
-          Text(this.getTitle())
+          Text(this.getTitleResource())
             .fontSize($r("app.float.fs_text_title_1"))
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.fs_color_text_primary"))
 
           // 4. 说明区
           Column({ space: 8 }) {
-            Text("功能演示中")
+            Text($r("app.string.fs_tool_demo_status"))
               .fontSize($r("app.float.fs_text_body_lg"))
               .fontWeight(FontWeight.Bold)
               .fontColor($r("app.color.fs_color_text_primary"))
@@ -72,7 +72,7 @@ export struct ToolShellPage {
 
           // 5. 操作区
           Column({ space: 12 }) {
-            Button("打开演示 Web 页")
+            Button($r("app.string.fs_tool_open_demo"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_inverse"))
               .backgroundColor($r("app.color.fs_color_primary"))
@@ -86,7 +86,7 @@ export struct ToolShellPage {
                 });
               })
 
-            Text("返回首页")
+            Text($r("app.string.fs_tool_back_home"))
               .fontSize($r("app.float.fs_text_body"))
               .fontColor($r("app.color.fs_color_text_secondary"))
               .onClick((): void => { this.navPathStack.pop(); })
@@ -99,7 +99,7 @@ export struct ToolShellPage {
         .alignItems(HorizontalAlign.Center)
 
         // 6. 底部小字
-        Text("本页面为入口演示版")
+        Text($r("app.string.fs_tool_demo_note"))
           .fontSize($r("app.float.fs_text_caption"))
           .fontColor($r("app.color.fs_color_text_tertiary"))
           .margin({ bottom: 32 })
@@ -124,6 +124,19 @@ export struct ToolShellPage {
     return "网页";
   }
 
+  private getTitleResource(): Resource {
+    if (this.toolId === "scan") {
+      return $r("app.string.fs_tool_title_scan");
+    }
+    if (this.toolId === "translate") {
+      return $r("app.string.fs_tool_title_translate");
+    }
+    if (this.toolId === "file") {
+      return $r("app.string.fs_tool_title_file");
+    }
+    return $r("app.string.fs_tool_title_web");
+  }
+
   private getIcon(): string {
     if (this.toolId === "scan") {
       return "⊞";
@@ -137,17 +150,17 @@ export struct ToolShellPage {
     return "🌐";
   }
 
-  private getDescription(): string {
+  private getDescription(): Resource {
     if (this.toolId === "scan") {
-      return "演示用：扫码功能将进入相机预览态（待接入 ScanKit / CameraX）。";
+      return $r("app.string.fs_tool_desc_scan");
     }
     if (this.toolId === "translate") {
-      return "演示用：翻译能力将集成 Speech Kit / ML Kit（待接入）。";
+      return $r("app.string.fs_tool_desc_translate");
     }
     if (this.toolId === "file") {
-      return "演示用：文件管理将基于 photoAccessHelper / Storage Access Framework（待接入）。";
+      return $r("app.string.fs_tool_desc_file");
     }
-    return "演示用：在 Web 容器中打开任意网页，支持 URL 拦截、登录态透传和错误页恢复。";
+    return $r("app.string.fs_tool_desc_web");
   }
 
   private getDemoUrl(): string {

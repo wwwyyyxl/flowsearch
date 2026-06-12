@@ -6,107 +6,107 @@
     },
     {
       "name": "fs_web_page_error",
-      "value": "页面加载失败"
+      "value": "Page load failed"
     },
     {
       "name": "fs_web_error_subtitle",
-      "value": "可能是网络异常或目标页面暂时不可用"
+      "value": "Network error or target page temporarily unavailable"
     },
     {
       "name": "fs_web_reload",
-      "value": "重新加载"
+      "value": "Reload"
     },
     {
       "name": "fs_web_back",
-      "value": "返回上一页"
+      "value": "Back"
     },
     {
       "name": "fs_web_back_home",
-      "value": "返回首页"
+      "value": "Back to home"
     },
     {
       "name": "fs_web_slow_load_hint",
-      "value": "页面加载较慢,请检查网络"
+      "value": "Page loading slowly, check network"
     },
     {
       "name": "fs_web_stop",
-      "value": "停止"
+      "value": "Stop"
     },
     {
       "name": "fs_web_login_expired_title",
-      "value": "登录已过期"
+      "value": "Login expired"
     },
     {
       "name": "fs_web_login_expired_desc",
-      "value": "请重新登录后继续访问该页面"
+      "value": "Please re-login to continue"
     },
     {
       "name": "fs_web_cancel",
-      "value": "取消"
+      "value": "Cancel"
     },
     {
       "name": "fs_web_relogin",
-      "value": "重新登录"
+      "value": "Re-login"
     },
     {
       "name": "fs_web_external_title",
-      "value": "即将打开外部应用"
+      "value": "About to open external app"
     },
     {
       "name": "fs_web_external_confirm",
-      "value": "打开"
+      "value": "Open"
     },
     {
       "name": "fs_web_refresh",
-      "value": "刷新"
+      "value": "Refresh"
     },
     {
       "name": "fs_web_open_in_browser",
-      "value": "在浏览器中打开"
+      "value": "Open in browser"
     },
     {
       "name": "fs_web_copy_link",
-      "value": "复制链接"
+      "value": "Copy link"
     },
     {
       "name": "fs_web_share",
-      "value": "分享"
+      "value": "Share"
     },
     {
       "name": "fs_web_favorite",
-      "value": "收藏"
+      "value": "Save"
     },
     {
       "name": "fs_web_unfavorite",
-      "value": "取消收藏"
+      "value": "Unfavorite"
     },
     {
       "name": "fs_web_error_code",
-      "value": "错误码"
+      "value": "Error code"
     },
     {
       "name": "fs_web_external_target",
-      "value": "目标"
+      "value": "Target"
     },
     {
       "name": "fs_web_external_confirm_msg",
-      "value": "确认打开该应用?"
+      "value": "Open this app?"
     },
     {
       "name": "fs_web_payment_not_supported",
-      "value": "演示版不支持真实支付"
+      "value": "Demo does not support real payments"
     },
     {
       "name": "fs_web_download_detected",
-      "value": "已识别下载链接(演示)"
+      "value": "Download link detected (demo)"
     },
     {
       "name": "fs_web_link_copied",
-      "value": "链接已复制"
+      "value": "Link copied"
     },
     {
       "name": "fs_web_copy_failed",
-      "value": "复制失败"
+      "value": "Copy failed"
     }
   ]
 }

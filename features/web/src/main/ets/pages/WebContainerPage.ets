@@ -53,6 +53,25 @@ export struct WebContainerPage {
     this.vm.init(this.url, this.title, this.needTokenInject, this.forceAllow, this.articleId, getContext(this));
   }
 
+  @Monitor('vm.toastMessage')
+  onToastChange(): void {
+    if (this.vm.toastMessage.length > 0) {
+      const key: string = this.vm.toastMessage;
+      let message: ResourceStr = "";
+      if (key === "payment_not_supported") {
+        message = $r("app.string.fs_web_payment_not_supported");
+      } else if (key === "download_detected") {
+        message = $r("app.string.fs_web_download_detected");
+      } else if (key === "link_copied") {
+        message = $r("app.string.fs_web_link_copied");
+      } else if (key === "copy_failed") {
+        message = $r("app.string.fs_web_copy_failed");
+      }
+      promptAction.showToast({ message: message });
+      this.vm.toastMessage = "";
+    }
+  }
+
   aboutToDisappear(): void {
     // 防内存泄漏:暂停媒体 + 停止加载,释放 Web 组件(PRD §04-04 §6 性能护栏)
     try {

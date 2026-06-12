@@ -6,51 +6,51 @@
     },
     {
       "name": "fs_tool_demo_status",
-      "value": "功能演示中"
+      "value": "Feature demo"
     },
     {
       "name": "fs_tool_open_demo",
-      "value": "打开演示 Web 页"
+      "value": "Open demo web page"
     },
     {
       "name": "fs_tool_back_home",
-      "value": "返回首页"
+      "value": "Back to home"
     },
     {
       "name": "fs_tool_demo_note",
-      "value": "本页面为入口演示版"
+      "value": "This page is a demo entry"
     },
     {
       "name": "fs_tool_title_web",
-      "value": "网页"
+      "value": "Web"
     },
     {
       "name": "fs_tool_title_scan",
-      "value": "扫码"
+      "value": "Scan"
     },
     {
       "name": "fs_tool_title_translate",
-      "value": "翻译"
+      "value": "Translate"
     },
     {
       "name": "fs_tool_title_file",
-      "value": "文件"
+      "value": "File"
     },
     {
       "name": "fs_tool_desc_web",
-      "value": "演示用：在 Web 容器中打开任意网页，支持 URL 拦截、登录态透传和错误页恢复。"
+      "value": "Demo: Open any webpage in the Web container, supporting URL interception, login token passthrough, and error page recovery."
     },
     {
       "name": "fs_tool_desc_scan",
-      "value": "演示用：扫码功能将进入相机预览态（待接入 ScanKit / CameraX）。"
+      "value": "Demo: Scan enters camera preview mode (ScanKit/CameraX integration pending)."
     },
     {
       "name": "fs_tool_desc_translate",
-      "value": "演示用：翻译能力将集成 Speech Kit / ML Kit（待接入）。"
+      "value": "Demo: Translation will integrate Speech Kit / ML Kit (integration pending)."
     },
     {
       "name": "fs_tool_desc_file",
-      "value": "演示用：文件管理将基于 photoAccessHelper / Storage Access Framework（待接入）。"
+      "value": "Demo: File management will use photoAccessHelper / Storage Access Framework (integration pending)."
     }
   ]
 }

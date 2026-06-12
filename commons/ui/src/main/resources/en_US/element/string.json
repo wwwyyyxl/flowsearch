@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "FlowSearch shared UI components module"
+    },
+    {
+      "name": "fs_state_loading",
+      "value": "Loading..."
+    },
+    {
+      "name": "fs_state_load_error",
+      "value": "Load failed"
+    },
+    {
+      "name": "fs_state_retry",
+      "value": "Retry"
+    },
+    {
+      "name": "fs_state_empty",
+      "value": "No content available"
+    },
+    {
+      "name": "fs_state_offline_hint",
+      "value": "Data from cache, pull to refresh"
+    },
+    {
+      "name": "fs_state_error_code",
+      "value": "Error code"
+    }
+  ]
+}

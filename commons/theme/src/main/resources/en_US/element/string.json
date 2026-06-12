@@ -6,27 +6,27 @@
     },
     {
       "name": "fs_theme_light",
-      "value": "浅色"
+      "value": "Light"
     },
     {
       "name": "fs_theme_dark",
-      "value": "深色"
+      "value": "Dark"
     },
     {
       "name": "fs_theme_system",
-      "value": "跟随系统"
+      "value": "Follow system"
     },
     {
       "name": "fs_font_small",
-      "value": "小号"
+      "value": "Small"
     },
     {
       "name": "fs_font_standard",
-      "value": "标准"
+      "value": "Standard"
     },
     {
       "name": "fs_font_large",
-      "value": "大号"
+      "value": "Large"
     }
   ]
 }

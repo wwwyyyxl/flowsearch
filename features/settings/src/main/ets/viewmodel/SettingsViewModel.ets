@@ -18,7 +18,6 @@
  *    清理缓存后重新计算(或直接显示 "0 B")。
  */
 
-import promptAction from "@ohos.promptAction";
 import { SettingsRepository, SettingsData } from "../repo/SettingsRepository";
 import { CacheCalculator } from "../cache/CacheCalculator";
 import { HistoryRepository, FavoritesRepository } from "@flowsearch/favs";
@@ -40,6 +39,9 @@ export class SettingsViewModel {
 
   /** 控制版本更新弹层。 */
   @Trace showUpdateDialog: boolean = false;
+
+  /** Toast 消息(由 Page 层 @Monitor 监听并展示)。 */
+  @Trace toastMessage: string = "";
 
   private settingsRepo: SettingsRepository = new SettingsRepository();
   private historyRepo: HistoryRepository = new HistoryRepository();
@@ -161,27 +163,27 @@ export class SettingsViewModel {
     const cacheDir: string = this.context.cacheDir;
     CacheCalculator.clearCacheDir(cacheDir).then((): void => {
       this.cacheSizeText = "0 B";
-      promptAction.showToast({ message: "缓存已清理" });
+      this.toastMessage = "cache_cleared";
     }).catch((_err: object): void => {
-      promptAction.showToast({ message: "清理失败" });
+      this.toastMessage = "clear_failed";
     });
   }
 
   /** 清理搜索历史。 */
   private clearHistory(): void {
     this.historyRepo.clearAll().then((): void => {
-      promptAction.showToast({ message: "搜索历史已清理" });
+      this.toastMessage = "history_cleared";
     }).catch((_err: object): void => {
-      promptAction.showToast({ message: "清理失败" });
+      this.toastMessage = "clear_failed";
     });
   }
 
   /** 清理收藏。 */
   private clearFavorites(): void {
     this.favRepo.clearAll().then((): void => {
-      promptAction.showToast({ message: "收藏已清理" });
+      this.toastMessage = "favorites_cleared";
     }).catch((_err: object): void => {
-      promptAction.showToast({ message: "清理失败" });
+      this.toastMessage = "clear_failed";
     });
   }
 
@@ -198,6 +200,6 @@ export class SettingsViewModel {
   /** 确认更新(mock)。 */
   confirmUpdate(): void {
     this.showUpdateDialog = false;
-    promptAction.showToast({ message: "已是最新版本" });
+    this.toastMessage = "already_latest";
   }
 }

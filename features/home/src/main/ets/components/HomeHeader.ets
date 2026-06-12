@@ -19,7 +19,7 @@ export struct HomeHeader {
           .fontWeight(FontWeight.Bold)
           .fontColor($r("app.color.fs_color_text_primary"))
 
-        Text("搜索、工具与内容聚合")
+        Text($r("app.string.fs_home_subtitle"))
           .fontSize($r("app.float.fs_text_caption"))
           .fontColor($r("app.color.fs_color_text_secondary"))
           .margin({ top: 2 })

@@ -306,7 +306,7 @@ export struct SearchResultPage {
             onCopyTap: (): void => {
               const pasteData = pasteboard.createData("text/plain", data.aiAnswer!.summary);
               pasteboard.getSystemPasteboard().setData(pasteData);
-              promptAction.showToast({ message: "已复制到剪贴板" });
+              promptAction.showToast({ message: $r("app.string.fs_search_copied") });
             }
           })
         }

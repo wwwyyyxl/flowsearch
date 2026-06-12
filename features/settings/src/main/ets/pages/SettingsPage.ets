@@ -61,6 +61,27 @@ export struct SettingsPage {
     this.vm.init(getContext(this));
   }
 
+  @Monitor('vm.toastMessage')
+  onToastChange(): void {
+    if (this.vm.toastMessage.length > 0) {
+      const key: string = this.vm.toastMessage;
+      let message: ResourceStr = "";
+      if (key === "cache_cleared") {
+        message = $r("app.string.fs_settings_cache_cleared");
+      } else if (key === "clear_failed") {
+        message = $r("app.string.fs_settings_clear_failed");
+      } else if (key === "history_cleared") {
+        message = $r("app.string.fs_settings_history_cleared");
+      } else if (key === "favorites_cleared") {
+        message = $r("app.string.fs_settings_favorites_cleared");
+      } else if (key === "already_latest") {
+        message = $r("app.string.fs_settings_already_latest");
+      }
+      promptAction.showToast({ message: message });
+      this.vm.toastMessage = "";
+    }
+  }
+
   build() {
     NavDestination() {
       Stack() {
