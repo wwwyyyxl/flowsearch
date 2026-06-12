@@ -37,7 +37,8 @@
  */
 
 import promptAction from "@ohos.promptAction";
-import { PageState, Article, SearchResultData, SortType } from "@flowsearch/base";
+import { pasteboard } from "@kit.BasicServicesKit";
+import { PageState, Article, SearchResultData, SortType, UrlDebounceGuard } from "@flowsearch/base";
 import { RouteTable, SearchResultArgs, WebContainerArgs } from "@flowsearch/router";
 import { SearchResultViewModel } from "../viewmodel/SearchResultViewModel";
 import { SearchTopBar } from "../components/SearchTopBar";
@@ -302,8 +303,10 @@ export struct SearchResultPage {
                 param: new SearchResultArgs(q)
               });
             },
-            onSummaryTap: (): void => {
-              promptAction.showToast({ message: "复制到剪贴板(待 S6 接入)" });
+            onCopyTap: (): void => {
+              const pasteData = pasteboard.createData("text/plain", data.aiAnswer!.summary);
+              pasteboard.getSystemPasteboard().setData(pasteData);
+              promptAction.showToast({ message: "已复制到剪贴板" });
             }
           })
         }
@@ -325,10 +328,12 @@ export struct SearchResultPage {
                 article: article,
                 keyword: this.vm.keyword,
                 onCardTap: (a: Article): void => {
-                  this.navPathStack.pushPath({
-                    name: RouteTable.WEB_CONTAINER,
-                    param: new WebContainerArgs(a.targetUrl, a.title, false, false, a.articleId)
-                  });
+                  if (UrlDebounceGuard.shouldOpen(a.targetUrl)) {
+                    this.navPathStack.pushPath({
+                      name: RouteTable.WEB_CONTAINER,
+                      param: new WebContainerArgs(a.targetUrl, a.title, false, false, a.articleId)
+                    });
+                  }
                 },
                 onFavoriteTap: (id: string): void => { this.vm.toggleFavorite(id); }
               })

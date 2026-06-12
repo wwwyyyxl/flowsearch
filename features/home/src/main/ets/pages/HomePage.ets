@@ -22,7 +22,7 @@
  */
 
 import promptAction from "@ohos.promptAction";
-import { PageState, Article, HomeFeedData } from "@flowsearch/base";
+import { PageState, Article, HomeFeedData, UrlDebounceGuard } from "@flowsearch/base";
 import { StateHost } from "@flowsearch/ui";
 import { RouteTable, WebContainerArgs, ToolShellArgs } from "@flowsearch/router";
 import { HomeViewModel } from "../viewmodel/HomeViewModel";
@@ -173,10 +173,12 @@ export struct HomePage {
             ArticleCard({
               article: article,
               onCardClick: (a: Article): void => {
-                this.navPathStack.pushPath({
-                  name: RouteTable.WEB_CONTAINER,
-                  param: new WebContainerArgs(a.targetUrl, a.title, false, false, a.articleId)
-                });
+                if (UrlDebounceGuard.shouldOpen(a.targetUrl)) {
+                  this.navPathStack.pushPath({
+                    name: RouteTable.WEB_CONTAINER,
+                    param: new WebContainerArgs(a.targetUrl, a.title, false, false, a.articleId)
+                  });
+                }
               },
               onFavoriteToggle: (id: string): void => { this.vm.toggleFavorite(id); }
             })

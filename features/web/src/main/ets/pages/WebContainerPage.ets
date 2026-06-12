@@ -18,6 +18,10 @@
 
 import promptAction from "@ohos.promptAction";
 import webview from "@ohos.web.webview";
+import { common } from "@kit.AbilityKit";
+import { systemShare } from "@kit.ShareKit";
+import { uniformTypeDescriptor as utd } from "@kit.ArkData";
+import { BusinessError } from "@kit.BasicServicesKit";
 import { PageState, WebContainerData } from "@flowsearch/base";
 import { WebContainerViewModel } from "../viewmodel/WebContainerViewModel";
 import { WebTopBar } from "../components/WebTopBar";
@@ -151,14 +155,29 @@ export struct WebContainerPage {
           },
           onOpenInBrowserTap: (): void => {
             this.vm.closeMoreMenu();
-            promptAction.showToast({ message: "在浏览器中打开(占位)" });
+            const data: WebContainerData | null = this.vm.getCurrentData();
+            if (data !== null) {
+              const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+              ctx.openLink(data.currentUrl);
+            }
           },
           onCopyLinkTap: (): void => {
             this.vm.copyLink();
           },
           onShareTap: (): void => {
             this.vm.closeMoreMenu();
-            promptAction.showToast({ message: "分享(占位)" });
+            const data: WebContainerData | null = this.vm.getCurrentData();
+            if (data !== null) {
+              const shareData: systemShare.SharedData = new systemShare.SharedData({
+                utd: utd.UniformDataType.TEXT,
+                content: data.currentUrl
+              });
+              const controller: systemShare.ShareController = new systemShare.ShareController(shareData);
+              const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+              controller.show(ctx, {
+                selectionMode: systemShare.SelectionMode.SINGLE
+              });
+            }
           },
           onFavoriteTap: (): void => {
             this.vm.toggleFavorite();

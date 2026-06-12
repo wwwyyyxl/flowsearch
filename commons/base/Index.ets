@@ -36,3 +36,6 @@ export type {
 // ===== Persistence 域(S4 新增) =====
 export { PreferencesHelper } from "./src/main/ets/persistence/PreferencesHelper";
 export { FavoriteRecord } from "./src/main/ets/types/FavoriteRecord";
+
+// ===== Utils 域(S12 新增) =====
+export { UrlDebounceGuard } from "./src/main/ets/utils/UrlDebounceGuard";

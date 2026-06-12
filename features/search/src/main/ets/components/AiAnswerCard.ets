@@ -20,8 +20,8 @@ export struct AiAnswerCard {
   /** 点击关联问题胶囊回调:新关键词触发 SearchResult 跳转。 */
   @Event onRelatedTap: (question: string) => void = (_q: string): void => {};
 
-  /** 点击 summary 区回调(本期可选,留作扩展练习接剪贴板)。 */
-  @Event onSummaryTap: () => void = (): void => {};
+  /** 点击"复制"按钮回调:复制 summary 到剪贴板。 */
+  @Event onCopyTap: () => void = (): void => {};
 
   build() {
     Column() {
@@ -58,7 +58,6 @@ export struct AiAnswerCard {
         .lineHeight(22)
         .width("100%")
         .margin({ top: $r("app.float.fs_space_md") })
-        .onClick((): void => { this.onSummaryTap(); })
 
       // 关联问题胶囊(最多 3 个,PRD §04-03 §6)
       Flex({ wrap: FlexWrap.Wrap }) {
@@ -76,11 +75,22 @@ export struct AiAnswerCard {
         .opacity(0.3)
         .margin({ top: $r("app.float.fs_space_md") })
 
-      Text(this.answer.disclaimer)
-        .fontSize($r("app.float.fs_text_caption"))
-        .fontColor($r("app.color.fs_color_text_tertiary"))
-        .width("100%")
-        .margin({ top: $r("app.float.fs_space_sm") })
+      Row() {
+        Text(this.answer.disclaimer)
+          .fontSize($r("app.float.fs_text_caption"))
+          .fontColor($r("app.color.fs_color_text_tertiary"))
+          .layoutWeight(1)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+        Text("复制")
+          .fontSize($r("app.float.fs_text_caption"))
+          .fontColor($r("app.color.fs_color_primary"))
+          .margin({ left: $r("app.float.fs_space_sm") })
+          .onClick((): void => { this.onCopyTap(); })
+      }
+      .width("100%")
+      .margin({ top: $r("app.float.fs_space_sm") })
     }
     .width("100%")
     .padding($r("app.float.fs_space_lg"))
