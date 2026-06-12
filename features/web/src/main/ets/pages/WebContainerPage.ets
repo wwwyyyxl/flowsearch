@@ -73,6 +73,8 @@ export struct WebContainerPage {
   }
 
   aboutToDisappear(): void {
+    // S24:清除慢加载定时器,防内存泄漏
+    this.vm.clearSlowTimer();
     // 防内存泄漏:暂停媒体 + 停止加载,释放 Web 组件(PRD §04-04 §6 性能护栏)
     try {
       this.controller.pauseAllMedia();

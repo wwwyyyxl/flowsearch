@@ -66,6 +66,9 @@ export class SearchInputViewModel {
   /** debounce token。每次输入变化自增,fetch 回来时 token 不匹配则丢弃。 */
   private suggestSeq: number = 0;
 
+  /** S24:存储 debounce setTimeout ID,dispose() 时清除防泄漏。 */
+  private suggestTimerId: number = -1;
+
   /** 初始化:从 Preferences 异步加载历史 + Mock 热搜。S4 改为传入 context。 */
   init(context: Context): void {
     this.historyRepo.init(context);
@@ -149,7 +152,7 @@ export class SearchInputViewModel {
     const mySeq: number = this.suggestSeq;
     this.loadingSuggestions = true;
 
-    setTimeout((): void => {
+    this.suggestTimerId = setTimeout((): void => {
       // 用户已经又输入了新内容 -> 丢弃本次请求
       if (mySeq !== this.suggestSeq) {
         return;
@@ -172,5 +175,13 @@ export class SearchInputViewModel {
           this.loadingSuggestions = false;
         });
     }, SUGGEST_DEBOUNCE_MS);
+  }
+
+  /** S24:清除待执行的 debounce 定时器,页面 aboutToDisappear 时调用。 */
+  dispose(): void {
+    if (this.suggestTimerId >= 0) {
+      clearTimeout(this.suggestTimerId);
+      this.suggestTimerId = -1;
+    }
   }
 }

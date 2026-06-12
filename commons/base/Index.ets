@@ -46,5 +46,8 @@ export { NetworkMonitor } from "./src/main/ets/utils/NetworkMonitor";
 // ===== Network 域(S21 新增) =====
 export { HttpClient, HttpError, ApiResponse } from "./src/main/ets/network/HttpClient";
 
+// ===== Perf 域(S24 新增) =====
+export { PerfTracker } from "./src/main/ets/utils/PerfTracker";
+
 // ===== Reading History 域(S13 新增) =====
 export { ReadingHistoryEntry } from "./src/main/ets/types/ReadingHistoryEntry";

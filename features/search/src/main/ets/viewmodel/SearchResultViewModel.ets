@@ -27,7 +27,7 @@
  *    收藏 toggle / 排序切换都 new 新 SearchResultData,@Trace 才稳触发。
  */
 
-import { PageState, Article, SearchResultData, AiQuickAnswer, SortType } from "@flowsearch/base";
+import { PageState, Article, SearchResultData, AiQuickAnswer, SortType, PerfTracker } from "@flowsearch/base";
 import { FavoritesRepository } from "@flowsearch/favs";
 import { SearchRepository, SearchRepoError, SearchFetchMoreResult } from "../repo/SearchRepository";
 import { SimulationMode } from "../repo/SimulationMode";
@@ -197,6 +197,9 @@ export class SearchResultViewModel {
     this.state = PageState.loading();
     this.dataSource.setArticles(new Array());
 
+    // S24:性能追踪
+    const traceId: number = PerfTracker.markStart("search_query");
+
     const aiPromise: Promise<AiQuickAnswer | null> = this.keyword.length < 2
       ? Promise.resolve<AiQuickAnswer | null>(null)
       : this.repository.fetchAiAnswer(this.keyword, this.simulationMode);
@@ -220,6 +223,9 @@ export class SearchResultViewModel {
         aiPromise.then((ai: AiQuickAnswer | null): void => {
           this.applyAiAnswerIfStillCurrent(ai);
         });
+        // S24:性能追踪完成
+        PerfTracker.markEnd("search_query", traceId);
+        PerfTracker.reportEvent("search_completed", { "keyword": this.keyword, "count": articles.length });
       })
       .catch((err: object): void => {
         const repoErr = err as SearchRepoError;

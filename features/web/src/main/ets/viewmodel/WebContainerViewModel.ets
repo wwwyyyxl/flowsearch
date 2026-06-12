@@ -33,7 +33,7 @@
  */
 
 import pasteboard from "@ohos.pasteboard";
-import { PageState, WebContainerData, WebInterceptRule, WebInterceptAction, Article } from "@flowsearch/base";
+import { PageState, WebContainerData, WebInterceptRule, WebInterceptAction, Article, PerfTracker } from "@flowsearch/base";
 import { WebRepository } from "../repo/WebRepository";
 import { FavoritesRepository, ReadingHistoryRepository } from "@flowsearch/favs";
 
@@ -42,17 +42,17 @@ const SLOW_THRESHOLD_MS: number = 5000;
 
 @ObservedV2
 export class WebContainerViewModel {
-  /** 路由入参:初始 URL。 */
-  @Trace initialUrl: string = "";
+  /** 路由入参:初始 URL。S24:写一次字段,去掉 @Trace 减少观察开销。 */
+  initialUrl: string = "";
 
   /** 路由入参:初始标题。WebView 抽到的真实 title 会覆盖。 */
-  @Trace initialTitle: string = "";
+  initialTitle: string = "";
 
   /** 路由入参:是否强制 token 注入。命中规则未命中时用此默认。 */
-  @Trace needTokenInjectDefault: boolean = false;
+  needTokenInjectDefault: boolean = false;
 
   /** 路由入参:深链 forceAllow,跳过所有拦截规则。 */
-  @Trace forceAllow: boolean = false;
+  forceAllow: boolean = false;
 
   /** 页面整体状态(Loading / Content / Error)。 */
   @Trace state: PageState = PageState.idle();
@@ -75,8 +75,8 @@ export class WebContainerViewModel {
   /** 更多菜单 ActionSheet 是否显示。 */
   @Trace showMoreMenu: boolean = false;
 
-  /** 路由入参:文章 id,用于详情页收藏。空串表示无关联文章。 */
-  @Trace articleId: string = "";
+  /** 路由入参:文章 id,用于详情页收藏。空串表示无关联文章。S24:写一次字段。 */
+  articleId: string = "";
 
   /** 当前文章是否已收藏。 */
   @Trace isFavorited: boolean = false;
@@ -176,6 +176,8 @@ export class WebContainerViewModel {
     if (data !== null) {
       this.readingRepo.add(data.currentUrl, data.displayTitle);
     }
+    // S24:性能追踪 — 页面加载完成
+    PerfTracker.reportEvent("web_page_loaded", { "url": _url });
   }
 
   /** Web 组件报告加载错误(NETWORK / TIMEOUT / etc)。 */
@@ -416,7 +418,7 @@ export class WebContainerViewModel {
     }, SLOW_THRESHOLD_MS);
   }
 
-  private clearSlowTimer(): void {
+  clearSlowTimer(): void {
     if (this.slowTimerId !== -1) {
       clearTimeout(this.slowTimerId);
       this.slowTimerId = -1;

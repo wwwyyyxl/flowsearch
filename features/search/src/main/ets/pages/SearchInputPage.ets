@@ -46,6 +46,11 @@ export struct SearchInputPage {
     this.vm.init(getContext(this));
   }
 
+  /** S24:页面销毁时清除 debounce 定时器,防内存泄漏。 */
+  aboutToDisappear(): void {
+    this.vm.dispose();
+  }
+
   build() {
     NavDestination() {
       Column() {

@@ -30,7 +30,7 @@
  *     ≈ _state.value = UiState.Loading
  */
 
-import { PageState, Channel, HomeFeedData, Article, ToolEntry } from "@flowsearch/base";
+import { PageState, Channel, HomeFeedData, Article, ToolEntry, PerfTracker } from "@flowsearch/base";
 import { HomeRepository, HomeRepoError, FetchMoreResult } from "../repo/HomeRepository";
 import { SimulationMode } from "../repo/SimulationMode";
 import { ArticleDataSource } from "./ArticleDataSource";
@@ -307,6 +307,9 @@ export class HomeViewModel {
 
     this.updateState(channelId, PageState.loading());
 
+    // S24:性能追踪
+    const traceId: number = PerfTracker.markStart("home_feed_load");
+
     this.repository.fetchFeed(channelId, this.simulationMode).then((data: HomeFeedData): void => {
       // 频道列表 + 工具入口只在首次成功时缓存(避免轮播)
       if (this.channels.length === 0 && data.channels.length > 0) {
@@ -331,6 +334,9 @@ export class HomeViewModel {
       if (channelId === this.currentChannelId) {
         this.feedDataSource.setArticles(data.articles);
       }
+      // S24:性能追踪完成
+      PerfTracker.markEnd("home_feed_load", traceId);
+      PerfTracker.reportEvent("home_feed_loaded", { "channel": channelId, "count": data.articles.length });
     }).catch((err: object): void => {
       const repoErr = err as HomeRepoError;
       const code: string = repoErr.errorCode !== undefined && repoErr.errorCode.length > 0

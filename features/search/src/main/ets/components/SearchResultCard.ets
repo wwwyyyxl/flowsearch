@@ -22,6 +22,7 @@ interface CategoryStyle {
   label: string;
 }
 
+@ReusableV2
 @ComponentV2
 export struct SearchResultCard {
   @Param article: Article = new Article({
