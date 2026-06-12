@@ -42,15 +42,15 @@
     },
     {
       "name": "fs_tool_desc_scan",
-      "value": "Demo: Scan enters camera preview mode (ScanKit/CameraX integration pending)."
+      "value": "ScanKit integration — scan QR codes and barcodes. URLs are automatically opened in the Web container."
     },
     {
       "name": "fs_tool_desc_translate",
-      "value": "Demo: Translation will integrate Speech Kit / ML Kit (integration pending)."
+      "value": "Online translation via Google Translate in the Web container, supporting multi-language translation."
     },
     {
       "name": "fs_tool_desc_file",
-      "value": "Demo: File management will use photoAccessHelper / Storage Access Framework (integration pending)."
+      "value": "System file picker (DocumentViewPicker) — select files from device storage and view file info."
     }
   ]
 }

@@ -42,15 +42,15 @@
     },
     {
       "name": "fs_tool_desc_scan",
-      "value": "演示用：扫码功能将进入相机预览态（待接入 ScanKit / CameraX）。"
+      "value": "接入 ScanKit 系统扫码，支持二维码和条形码识别。扫码结果为 URL 时自动跳转 Web 容器打开。"
     },
     {
       "name": "fs_tool_desc_translate",
-      "value": "演示用：翻译能力将集成 Speech Kit / ML Kit（待接入）。"
+      "value": "在线翻译服务，点击按钮跳转 Web 容器打开 Google Translate，支持多语言互译。"
     },
     {
       "name": "fs_tool_desc_file",
-      "value": "演示用：文件管理将基于 photoAccessHelper / Storage Access Framework（待接入）。"
+      "value": "接入系统文件选择器(DocumentViewPicker)，支持从设备存储中选择文件并显示文件信息。"
     }
   ]
 }
