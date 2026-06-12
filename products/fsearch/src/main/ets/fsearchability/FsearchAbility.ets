@@ -1,6 +1,7 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want, errorManager } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { pushService, pushCommon } from '@kit.PushKit';
 import { RouteTable } from "@flowsearch/router";
 import { ThemeManager } from "@flowsearch/theme";
 import { PreferencesHelper, NetworkMonitor } from "@flowsearch/base";
@@ -40,6 +41,9 @@ export default class FsearchAbility extends UIAbility {
     // S18:启动网络状态监听
     NetworkMonitor.getInstance().start(this.context);
 
+    // S23:PushKit 初始化(获取 Token + 注册前台消息监听)
+    this.initPush();
+
     // S14:记录深链(loadContent 回调后派发)
     if (want.uri !== undefined && want.uri.length > 0) {
       this.pendingDeepLinkUri = want.uri;
@@ -61,6 +65,10 @@ export default class FsearchAbility extends UIAbility {
   onDestroy(): void {
     errorManager.off('globalErrorOccurred');
     NetworkMonitor.getInstance().stop();
+    // S23:注销 PushKit Token 更新监听
+    try {
+      pushService.off('tokenUpdate');
+    } catch (_e) {}
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onDestroy');
   }
 
@@ -88,6 +96,51 @@ export default class FsearchAbility extends UIAbility {
 
   onBackground(): void {
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onBackground');
+  }
+
+  // ============================================================
+  // S23: PushKit 初始化
+  // ============================================================
+
+  /**
+   * PushKit 初始化:获取 Token + 注册前台消息监听 + 监听 Token 轮转。
+   *
+   * 鸿蒙文档依据:
+   *   - pushService.getToken(): Promise<string> — 获取推送 Token(112 字符)
+   *   - pushService.receiveMessage('DEFAULT', this, callback) — 前台通知消息
+   *   - pushService.on('tokenUpdate', this, callback) — Token 轮转(跨区变更)
+   *   - pushService.off('tokenUpdate') — onDestroy 注销
+   *   - 需要 module.json5 中 action.ohos.push.listener skill
+   *   - 不需要 ohos.permission.RECEIVE_MESSAGE(那是旧 HMS SDK)
+   */
+  private initPush(): void {
+    // 1. 获取推送 Token
+    pushService.getToken().then((token: string): void => {
+      hilog.info(DOMAIN, TAG, 'Push token obtained, length=%{public}d', token.length);
+    }).catch((err: object): void => {
+      hilog.warn(DOMAIN, TAG, 'Push getToken failed: %{public}s', JSON.stringify(err));
+    });
+
+    // 2. 注册前台通知消息监听
+    try {
+      pushService.receiveMessage('DEFAULT', this, (payload: pushCommon.PushPayload): void => {
+        hilog.info(DOMAIN, TAG, 'Push message received, type=%{public}s', payload.type);
+        // payload.data 是 JSON 字符串，包含 notification.title / notification.body 等
+        // 完整日志输出便于调试，生产环境按需解析
+        hilog.info(DOMAIN, TAG, 'Push payload: %{public}s', payload.data);
+      });
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, 'Push receiveMessage failed: %{public}s', JSON.stringify(err));
+    }
+
+    // 3. 监听 Token 轮转(设备跨区变更时 Token 更新)
+    try {
+      pushService.on('tokenUpdate', this, (newToken: string): void => {
+        hilog.info(DOMAIN, TAG, 'Push token updated, length=%{public}d', newToken.length);
+      });
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, 'Push on(tokenUpdate) failed: %{public}s', JSON.stringify(err));
+    }
   }
 
   // ============================================================
