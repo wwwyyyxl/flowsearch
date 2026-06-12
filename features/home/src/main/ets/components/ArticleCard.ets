@@ -20,6 +20,7 @@
  */
 
 import { Article, CategoryTag } from "@flowsearch/base";
+import { LazyImage } from "@flowsearch/ui";
 
 interface CategoryStyle {
   bg: ResourceColor;
@@ -108,23 +109,35 @@ export struct ArticleCard {
     .onClick((): void => { this.onCardClick(this.article); })
   }
 
-  /** 左侧封面占位:56x56 圆角方块,按 categoryTag 取颜色。 */
+  /** 左侧封面:S19 用 LazyImage,有 coverUrl 时加载真实图片,无则用分类色块占位。 */
   @Builder
   buildCover() {
-    Stack() {
-      Column()
-        .width(56)
-        .height(56)
-        .borderRadius($r("app.float.fs_radius_md"))
-        .backgroundColor(this.styleOf(this.article.categoryTag).bg)
+    if (this.article.coverUrl !== null && this.article.coverUrl.length > 0) {
+      // S19:有真实封面 URL → LazyImage 加载
+      LazyImage({
+        src: this.article.coverUrl,
+        placeholderText: this.article.coverPlaceholder,
+        imgWidth: "56vp",
+        imgHeight: "56vp",
+        imgBorderRadius: "8vp"
+      })
+    } else {
+      // 无封面:分类色块 + 文字标签
+      Stack() {
+        Column()
+          .width(56)
+          .height(56)
+          .borderRadius($r("app.float.fs_radius_md"))
+          .backgroundColor(this.styleOf(this.article.categoryTag).bg)
 
-      Text(this.styleOf(this.article.categoryTag).label)
-        .fontSize($r("app.float.fs_text_caption"))
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.styleOf(this.article.categoryTag).text)
+        Text(this.styleOf(this.article.categoryTag).label)
+          .fontSize($r("app.float.fs_text_caption"))
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.styleOf(this.article.categoryTag).text)
+      }
+      .width(56)
+      .height(56)
     }
-    .width(56)
-    .height(56)
   }
 
   /** categoryTag -> 角标样式映射(PRD §02 §1 卡片角标颜色)。 */

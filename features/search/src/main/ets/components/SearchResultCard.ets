@@ -14,6 +14,7 @@
  */
 
 import { Article, CategoryTag } from "@flowsearch/base";
+import { LazyImage } from "@flowsearch/ui";
 
 interface CategoryStyle {
   bg: ResourceColor;
@@ -98,21 +99,34 @@ export struct SearchResultCard {
 
   @Builder
   buildBadge() {
-    Stack() {
-      Column()
-        .width(56)
-        .height(56)
-        .borderRadius($r("app.float.fs_radius_md"))
-        .backgroundColor(this.styleOf(this.article.categoryTag).bg)
+    if (this.article.coverUrl !== null && this.article.coverUrl.length > 0) {
+      // S19:有封面 URL → LazyImage 加载
+      LazyImage({
+        src: this.article.coverUrl,
+        placeholderText: this.article.coverPlaceholder,
+        imgWidth: "56vp",
+        imgHeight: "56vp",
+        imgBorderRadius: "8vp"
+      })
+      .flexShrink(0)
+    } else {
+      // 无封面:分类色块
+      Stack() {
+        Column()
+          .width(56)
+          .height(56)
+          .borderRadius($r("app.float.fs_radius_md"))
+          .backgroundColor(this.styleOf(this.article.categoryTag).bg)
 
-      Text(this.styleOf(this.article.categoryTag).label)
-        .fontSize($r("app.float.fs_text_caption"))
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.styleOf(this.article.categoryTag).text)
+        Text(this.styleOf(this.article.categoryTag).label)
+          .fontSize($r("app.float.fs_text_caption"))
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.styleOf(this.article.categoryTag).text)
+      }
+      .width(56)
+      .height(56)
+      .flexShrink(0)
     }
-    .width(56)
-    .height(56)
-    .flexShrink(0)
   }
 
   /**
