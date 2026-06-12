@@ -28,6 +28,7 @@ export struct WebTopBar {
         .width(40)
         .height("100%")
         .textAlign(TextAlign.Center)
+        .accessibilityText("返回上一页")
         .onClick((): void => { this.onBackTap(); })
 
       // 中:两行标题 + 域名
@@ -67,6 +68,7 @@ export struct WebTopBar {
         .width(40)
         .height("100%")
         .textAlign(TextAlign.Center)
+        .accessibilityText("更多操作")
         .onClick((): void => { this.onMoreTap(); })
     }
     .width("100%")

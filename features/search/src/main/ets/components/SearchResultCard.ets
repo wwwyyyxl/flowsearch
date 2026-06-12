@@ -82,6 +82,9 @@ export struct SearchResultCard {
           Text(this.article.favorite ? "已收藏" : "收藏")
             .fontSize($r("app.float.fs_text_body"))
             .fontColor($r("app.color.fs_color_primary"))
+            .accessibilityText(this.article.favorite
+              ? `取消收藏 ${this.article.title}`
+              : `收藏 ${this.article.title}`)
             .onClick((): void => { this.onFavoriteTap(this.article.articleId); })
         }
         .width("100%")

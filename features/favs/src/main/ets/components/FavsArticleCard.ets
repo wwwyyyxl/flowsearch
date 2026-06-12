@@ -54,6 +54,7 @@ export struct FavsArticleCard {
             Text(this.removeLabel)
               .fontSize($r("app.float.fs_text_caption"))
               .fontColor($r("app.color.fs_color_danger"))
+              .accessibilityText(`移除 ${this.article.title}`)
               .onClick((): void => { this.onRemoveTap(this.article.articleId); })
           }
         }

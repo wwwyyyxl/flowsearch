@@ -47,6 +47,7 @@ export struct HomeSearchBar {
     .borderRadius($r("app.float.fs_radius_md"))
     .border({ width: 1, color: $r("app.color.fs_color_border") })
     .alignItems(VerticalAlign.Center)
+    .accessibilityText("搜索框，点击进入搜索")
     .onClick((): void => { this.onSearchBarTap(); })
   }
 }

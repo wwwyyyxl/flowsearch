@@ -39,6 +39,7 @@ export struct HomeHeader {
       }
       .width(36)
       .height(36)
+      .accessibilityText("用户头像")
     }
     .width("100%")
     .padding({

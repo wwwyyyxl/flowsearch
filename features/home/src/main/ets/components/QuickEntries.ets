@@ -79,6 +79,7 @@ export struct QuickEntries {
     }
     .layoutWeight(1)
     .alignItems(HorizontalAlign.Center)
+    .accessibilityText(entry.name)
     .onClick((): void => { this.onEntryClick(entry.toolId); })
   }
 

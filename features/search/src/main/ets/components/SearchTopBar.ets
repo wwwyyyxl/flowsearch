@@ -61,6 +61,7 @@ export struct SearchTopBar {
           .height(32)
           .textAlign(TextAlign.Center)
           .margin({ right: $r("app.float.fs_space_sm") })
+          .accessibilityText("返回")
           .onClick((): void => { this.onBackTap(); })
       }
 
@@ -119,6 +120,7 @@ export struct SearchTopBar {
               .fontSize(18)
               .fontColor($r("app.color.fs_color_text_tertiary"))
               .margin({ right: $r("app.float.fs_space_md") })
+              .accessibilityText("清空搜索")
               .onClick((): void => { this.onClearTap(); })
           }
         }
